@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.com/WebReflection/uce.svg?branch=master)](https://travis-ci.com/WebReflection/uce) [![Coverage Status](https://coveralls.io/repos/github/WebReflection/uce/badge.svg?branch=master)](https://coveralls.io/github/WebReflection/uce?branch=master)
 
-<sup>**Social Media Photo by [Suzanne D. Williams](https://unsplash.com/@scw1217) on [Unsplash](https://unsplash.com/)**</sup>
+<sup>**Social Media Photo by [Dawid Zawiła](https://unsplash.com/@davealmine) on [Unsplash](https://unsplash.com/)**</sup>
 
-[µhtml](https://github.com/WebReflection/uhtml#readme) based Custom Elements
+[µhtml](https://github.com/WebReflection/uhtml#readme) based Custom Elements.
+
+**[Live Demo](https://codepen.io/WebReflection/pen/MWwJpWx?editors=0010)**
 
 ```js
 import {define} from 'uce';
@@ -62,5 +64,3 @@ define('my-component', {
 
 });
 ```
-
-**[Live Demo](https://codepen.io/WebReflection/pen/MWwJpWx?editors=0010)**
