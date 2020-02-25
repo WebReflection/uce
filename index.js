@@ -714,35 +714,33 @@ var uce = (function (exports) {
     for (var k = keys(definition), i = 0, _length = k.length; i < _length; i++) {
       var key = k[i];
 
-      if (/^on/.test(key)) {
-        if (!/Options$/.test(key)) {
-          var options = definition[key + 'Options'] || false;
-          var lower = key.toLowerCase();
-          var type = lower.slice(2);
+      if (/^on/.test(key) && !/Options$/.test(key)) {
+        var options = definition[key + 'Options'] || false;
+        var lower = key.toLowerCase();
+        var type = lower.slice(2);
+        listeners.push({
+          type: type,
+          options: options
+        });
+        retype[type] = key;
+
+        if (lower !== key) {
+          type = key.slice(2, 3).toLowerCase() + key.slice(3);
+          retype[type] = key;
           listeners.push({
             type: type,
             options: options
           });
-          retype[type] = key;
-
-          if (lower !== key) {
-            type = key.slice(2, 3).toLowerCase() + key.slice(3);
-            retype[type] = key;
-            listeners.push({
-              type: type,
-              options: options
-            });
-          }
         }
-      } else {
-        switch (key) {
-          case 'attachShadow':
-          case 'observedAttributes':
-            break;
+      }
 
-          default:
-            proto[key] = getOwnPropertyDescriptor(definition, key);
-        }
+      switch (key) {
+        case 'attachShadow':
+        case 'observedAttributes':
+          break;
+
+        default:
+          proto[key] = getOwnPropertyDescriptor(definition, key);
       }
     }
 
@@ -811,9 +809,8 @@ var uce = (function (exports) {
             value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
           }
         });
+        if (init) init.call(element);
       }
-
-      if (init) init.call(element);
     }
   };
 

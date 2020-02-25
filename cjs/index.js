@@ -26,29 +26,25 @@ const define = (tagName, definition) => {
   const listeners = [];
   const retype = create(null);
   for (let k = keys(definition), i = 0, {length} = k; i < length; i++) {
-    let key = k[i];
-    if (/^on/.test(key)) {
-      if (!/Options$/.test(key)) {
-        const options = definition[key + 'Options'] || false;
-        const lower = key.toLowerCase();
-        let type = lower.slice(2);
-        listeners.push({type, options});
+    const key = k[i];
+    if (/^on/.test(key) && !/Options$/.test(key)) {
+      const options = definition[key + 'Options'] || false;
+      const lower = key.toLowerCase();
+      let type = lower.slice(2);
+      listeners.push({type, options});
+      retype[type] = key;
+      if (lower !== key) {
+        type = key.slice(2, 3).toLowerCase() + key.slice(3);
         retype[type] = key;
-        if (lower !== key) {
-          type = key.slice(2, 3).toLowerCase() + key.slice(3);
-          retype[type] = key;
-          listeners.push({type, options});
-        }
+        listeners.push({type, options});
       }
     }
-    else {
-      switch (key) {
-        case 'attachShadow':
-        case 'observedAttributes':
-          break;
-        default:
-          proto[key] = getOwnPropertyDescriptor(definition, key);
-      }
+    switch (key) {
+      case 'attachShadow':
+      case 'observedAttributes':
+        break;
+      default:
+        proto[key] = getOwnPropertyDescriptor(definition, key);
     }
   }
   const {length} = listeners;
@@ -56,6 +52,7 @@ const define = (tagName, definition) => {
     proto.handleEvent = {value(event) {
       this[retype[event.type]](event);
     }};
+
   if (observedAttributes)
     statics.observedAttributes = {value: observedAttributes};
   proto.attributeChangedCallback =  {value() {
@@ -63,13 +60,16 @@ const define = (tagName, definition) => {
     if (attributeChanged)
       attributeChanged.apply(this, arguments);
   }};
+
   proto.connectedCallback = {value() {
     bootstrap(this);
     if (connected)
       connected.apply(this, arguments);
   }};
+
   if (disconnected)
     proto.disconnectedCallback = {value: disconnected};
+
   const kind = definition.extends || 'element';
   class MicroElement extends Class(kind) {};
   defineProperties(MicroElement, statics);
@@ -92,9 +92,9 @@ const define = (tagName, definition) => {
           attachShadow ? element.attachShadow(attachShadow) : element
         )
       }});
+      if (init)
+        init.call(element);
     }
-    if (init)
-      init.call(element);
   }
 };
 exports.define = define;
