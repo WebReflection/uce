@@ -20,7 +20,12 @@ define('my-component', {
   // if specified, it's like the constructor
   // it's granted to be invoked *only once* on bootstrap
   // and *always* before connected/attributeChanged
-  init() {},
+  init() {
+    // µhtml is provided automatically via this.html
+    // it will populate the shadow root, even if closed
+    // or simply the node, if no attachShadow is defined
+    this.html`<h1>Hello 👋 µce</h1>`;
+  },
 
   // if specified, it renders within its Shadow DOM
   // compatible with both open and closed modes
@@ -62,5 +67,24 @@ define('my-component', {
     return this.test;
   }
 
+});
+```
+
+### Without classes, how does one define private properties?
+
+Private properties can be created via a _WeakMap_, which is indeed how _Babel_ transforms these anyway.
+
+```js
+const privates = new WeakMap;
+define('ce-with-privates', {
+  init() {
+    // define these once
+    privates.set(this, {test: 1, other: '2'});
+  },
+  method() {
+    // and use it anywhere you need them
+    const {test, other} = privates.get(this);
+    console.log(test, other);
+  }
 });
 ```
