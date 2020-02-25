@@ -36,5 +36,13 @@
   "unpkg": "min.js",
   "dependencies": {
     "uhtml": "^1.1.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/uce.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WebReflection/uce/issues"
+  },
+  "homepage": "https://github.com/WebReflection/uce#readme"
 }
