@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  if(this.customElements)
+    try{customElements.define('built-in',document.createElement('p').constructor,{'extends':'p'})}
+    catch(s){document.write('<script src="//unpkg.com/@ungap/custom-elements-builtin"><\x2fscript>')}
+  else
+    document.write('<script src="//unpkg.com/document-register-element"><\x2fscript>');
+  if (!document.documentElement.attachShadow)
+    document.write('<script src="//unpkg.com/attachshadow"><\x2fscript>');
+  if (this.Reflect)
+    document.write('<script src="../new.js"><\x2fscript>');
+  else
+    document.write('<script src="../min.js"><\x2fscript>');
+  </script>
+  <script>
+  uce.define('my-counter', {
+    attachShadow: {mode: 'open'},
+    init: function () {
+      this.count = 0;
+      this.dec = this.dec.bind(this);
+      this.inc = this.inc.bind(this);
+      this.template = [
+        '<style>\
+        * {\
+          font-size: 200%;\
+        }\
+        span {\
+          width: 4rem;\
+          display: inline-block;\
+          text-align: center;\
+        }\
+        button {\
+          width: 64px;\
+          height: 64px;\
+          border: none;\
+          border-radius: 10px;\
+          background-color: seagreen;\
+          color: white;\
+        }\
+        </style>\
+        <button onclick="',
+        '">-</button><span>',
+        '</span><button onclick="',
+        '">+</button>'
+      ];
+      this.render();
+    },
+    dec: function () {
+      this.count--;
+      this.render();
+    },
+    inc: function () {
+      this.count++;
+      this.render();
+    },
+    render: function () {
+      this.html(this.template, this.dec, this.count, this.inc);
+    }
+  });
+  </script>
+</head>
+<body>
+  <my-counter></my-counter>
+</body>
+</html>
