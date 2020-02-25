@@ -6,7 +6,7 @@
 
 [µhtml](https://github.com/WebReflection/uhtml#readme) based Custom Elements.
 
-**[Live Demo](https://codepen.io/WebReflection/pen/MWwJpWx?editors=0010)**
+**[Test Page](https://webreflection.github.io/uce/test/)** or **[Code Pen](https://codepen.io/WebReflection/pen/MWwJpWx?editors=0010)**
 
 ```js
 import {define} from 'uce';
