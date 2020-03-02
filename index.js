@@ -70,6 +70,9 @@ var uce = (function (exports) {
     return info;
   };
 
+  var create = Object.create,
+      defineProperties = Object.defineProperties;
+
   /**
    * ISC License
    *
@@ -262,13 +265,18 @@ var uce = (function (exports) {
 
     return path;
   };
-  var defineProperties = Object.defineProperties;
   var getWire = function getWire(fragment) {
     var childNodes = fragment.childNodes;
     var length = childNodes.length;
     if (length === 1) return childNodes[0];
     var nodes = slice.call(childNodes, 0);
     return defineProperties(fragment, {
+      firstChild: {
+        value: nodes[0]
+      },
+      lastChild: {
+        value: nodes[length - 1]
+      },
       remove: {
         value: function value() {
           var range = document.createRange();
@@ -387,8 +395,7 @@ var uce = (function (exports) {
       return function (newValue) {
         if (oldValue !== newValue) {
           if (oldValue) node.removeEventListener(type, oldValue, false);
-          oldValue = newValue;
-          if (newValue) node.addEventListener(type, newValue, false);
+          if (oldValue = newValue) node.addEventListener(type, newValue, false);
         }
       };
     } // all other cases
@@ -431,9 +438,7 @@ var uce = (function (exports) {
     var type = options.type,
         path = options.path;
     var node = path.reduce(getNode, this);
-    if (type === 'node') return handleAnything(node, []);
-    if (type === 'attr') return handleAttribute(node, options.name);
-    return handleText(node);
+    return type === 'node' ? handleAnything(node, []) : type === 'attr' ? handleAttribute(node, options.name) : handleText(node);
   }
 
   var prefix = 'isµ';
@@ -635,9 +640,6 @@ var uce = (function (exports) {
     this.values = values;
   }
 
-  var create = Object.create,
-      defineProperties$1 = Object.defineProperties;
-
   var util = function util(type) {
     var cache = new WeakMap();
 
@@ -651,7 +653,7 @@ var uce = (function (exports) {
       };
     };
 
-    return defineProperties$1(function (template) {
+    return defineProperties(function (template) {
       for (var _len2 = arguments.length, values = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
         values[_key2 - 1] = arguments[_key2];
       }
@@ -695,7 +697,7 @@ var uce = (function (exports) {
   var _customElements = customElements,
       defineCustomElement = _customElements.define;
   var create$1 = Object.create,
-      defineProperties$2 = Object.defineProperties,
+      defineProperties$1 = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
       keys = Object.keys;
   var initialized = new WeakMap();
@@ -787,8 +789,8 @@ var uce = (function (exports) {
 
       return MicroElement;
     }(Class(kind));
-    defineProperties$2(MicroElement, statics);
-    defineProperties$2(MicroElement.prototype, proto);
+    defineProperties$1(MicroElement, statics);
+    defineProperties$1(MicroElement.prototype, proto);
     var args = [tagName, MicroElement];
     if (kind !== 'element') args.push({
       "extends": kind
@@ -808,7 +810,7 @@ var uce = (function (exports) {
           }
         }
 
-        defineProperties$2(element, {
+        defineProperties$1(element, {
           html: {
             value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
           }
