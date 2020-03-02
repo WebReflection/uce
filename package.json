@@ -1,6 +1,6 @@
 {
   "name": "uce",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "µhtml based Custom Elements",
   "main": "cjs/index.js",
   "scripts": {
