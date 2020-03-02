@@ -70,6 +70,14 @@ var uce = (function (exports) {
     return info;
   };
 
+  var trimStart = ''.trimStart || function () {
+    return this.replace(/^[\s\uFEFF\xA0]+/, '');
+  };
+
+  var trimEnd = ''.trimEnd || function () {
+    return this.replace(/[\s\uFEFF\xA0]+$/, '');
+  };
+
   /**
    * ISC License
    *
@@ -427,14 +435,6 @@ var uce = (function (exports) {
     if (type === 'attr') return handleAttribute(node, options.name);
     return handleText(node);
   }
-
-  var empty = '';
-  var trimStart = empty.trimStart || function () {
-    return this.replace(/^[ \f\n\r\t]+/, empty);
-  };
-  var trimEnd = empty.trimEnd || function () {
-    return this.replace(/[ \f\n\r\t]+$/, empty);
-  };
 
   var prefix = 'isµ';
   var attr = /([^ \f\n\r\t\\>"'=]+)\s*=\s*(['"]?)$/;
