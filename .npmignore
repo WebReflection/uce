@@ -2,5 +2,6 @@
 node_modules/
 rollup/
 test/
+uce-head.jpg
 package-lock.json
 .travis.yml
