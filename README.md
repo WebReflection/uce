@@ -6,12 +6,12 @@
 
 <sup>**Social Media Photo by [Dawid Zawiła](https://unsplash.com/@davealmine) on [Unsplash](https://unsplash.com/)**</sup>
 
-[µhtml](https://github.com/WebReflection/uhtml#readme) based Custom Elements.
+**[µhtml](https://github.com/WebReflection/uhtml#readme)** based Custom Elements.
 
 
 ## API In A Nutshell
 
-**[Test Page](https://webreflection.github.io/uce/test/)** or **[Code Pen](https://codepen.io/WebReflection/pen/MWwJpWx?editors=0010)**
+Check out the [test page](https://webreflection.github.io/uce/test/) or this [code pen playground](https://codepen.io/WebReflection/pen/MWwJpWx?editors=0010).
 
 ```js
 import {define} from 'uce';
