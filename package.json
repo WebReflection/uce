@@ -40,7 +40,7 @@
   "module": "esm/index.js",
   "unpkg": "min.js",
   "dependencies": {
-    "uhtml": "^1.4.7"
+    "uhtml": "^1.4.9"
   },
   "repository": {
     "type": "git",
