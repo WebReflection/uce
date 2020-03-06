@@ -41,7 +41,7 @@ define('my-component', {
 
   // if specified, will be notified per each
   // observed attribute change
-  attributeChanged(name, newValue, oldValue){},
+  attributeChanged(name, oldValue, newValue){},
 
   // if specified, will be invoked when the node
   // is either appended live, or removed
