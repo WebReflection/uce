@@ -1,4 +1,4 @@
-import {render, html} from 'uhtml';
+import {render, html} from 'lighterhtml';
 
 const {define: defineCustomElement} = customElements;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;

@@ -1,5 +1,5 @@
 'use strict';
-const {render, html} = require('uhtml');
+const {render, html} = require('lighterhtml');
 
 const {define: defineCustomElement} = customElements;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;

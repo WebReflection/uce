@@ -1,5 +1,5 @@
 {
-  "name": "uce",
+  "name": "uce-lighter",
   "version": "0.3.9",
   "description": "µhtml based Custom Elements",
   "main": "cjs/index.js",
@@ -40,7 +40,7 @@
   "module": "esm/index.js",
   "unpkg": "min.js",
   "dependencies": {
-    "uhtml": "^1.4.9"
+    "lighterhtml": "^2.1.0"
   },
   "repository": {
     "type": "git",

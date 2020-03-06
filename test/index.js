@@ -2,7 +2,7 @@ require('basichtml').init();
 
 document.importNode = function (arg) {};
 
-const uhtml = require('uhtml');
+const uhtml = require('lighterhtml');
 uhtml.html = function () { return ''; };
 const {define} = require('../cjs');
 
