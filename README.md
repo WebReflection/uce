@@ -75,6 +75,7 @@ define('my-component', {
 });
 ```
 
+
 ### Without classes, how does one define private properties?
 
 Private properties can be created via a _WeakMap_, which is indeed how _Babel_ transforms these anyway.
@@ -92,4 +93,36 @@ define('ce-with-privates', {
     console.log(test, other);
   }
 });
+```
+
+
+### Without classes, how does one extend other components?
+
+Object literals have been used as mixin for a very long time, and the pattern in here would likely be very similar.
+
+The only warning is that `Object.assign`, as well as object `{...spread}`, lose getters and setters in the process, so that if you want to extend more complex components, you should consider using [assignProperties](https://github.com/WebReflection/assign-properties#readme), or a similar helper.
+
+```js
+import $ from 'assign-properties';
+const mixin = (...components) => $({}, ...components);
+
+// a component literal definition
+const NamedElement = {
+  get name () { return this.tagName; }
+};
+
+// a generic NamedElement mixin
+const FirstComponent = mixin(NamedElement, {
+  method() {
+    console.log(this.name);
+  }
+});
+
+// define it via the FirstComponent mixin
+define('first-component', FirstComponent);
+
+// define it via mixin
+define('first-component', mixin(FirstComponent, {
+  otherThing() {}
+}));
 ```
