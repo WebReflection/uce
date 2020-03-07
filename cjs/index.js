@@ -1,5 +1,5 @@
 'use strict';
-const {render, html} = require('uhtml');
+const {render, html, svg} = require('uhtml');
 
 const {define: defineCustomElement} = customElements;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
@@ -10,6 +10,10 @@ const Class = kind => kind === 'element' ?
   HTMLElement :
   document.createElement(kind).constructor
 ;
+
+exports.render = render;
+exports.html = html;
+exports.svg = svg;
 
 const define = (tagName, definition) => {
   const {

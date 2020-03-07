@@ -749,7 +749,6 @@ var uce = (function (exports) {
   var Class = function Class(kind) {
     return kind === 'element' ? HTMLElement : document.createElement(kind).constructor;
   };
-
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
         attributeChanged = definition.attributeChanged,
@@ -869,6 +868,9 @@ var uce = (function (exports) {
   }
 
   exports.define = define;
+  exports.html = html;
+  exports.render = render;
+  exports.svg = svg;
 
   return exports;
 

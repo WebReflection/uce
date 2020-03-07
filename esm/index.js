@@ -1,4 +1,4 @@
-import {render, html} from 'uhtml';
+import {render, html, svg} from 'uhtml';
 
 const {define: defineCustomElement} = customElements;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
@@ -9,6 +9,8 @@ const Class = kind => kind === 'element' ?
   HTMLElement :
   document.createElement(kind).constructor
 ;
+
+export {render, html, svg};
 
 export const define = (tagName, definition) => {
   const {
