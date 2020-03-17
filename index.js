@@ -873,9 +873,10 @@ var uce = (function (exports) {
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
       keys = Object.keys;
   var initialized = new WeakMap();
+  var element = 'element';
 
   var Class = function Class(kind) {
-    return kind === 'element' ? HTMLElement : document.createElement(kind).constructor;
+    return kind === element ? HTMLElement : document.createElement(kind).constructor;
   };
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
@@ -904,7 +905,7 @@ var uce = (function (exports) {
         retype[type] = key;
 
         if (lower !== key) {
-          type = key.slice(2, 3).toLowerCase() + key.slice(3);
+          type = lower.slice(2, 3) + key.slice(3);
           retype[type] = key;
           listeners.push({
             type: type,
@@ -947,7 +948,7 @@ var uce = (function (exports) {
     if (disconnected) proto.disconnectedCallback = {
       value: disconnected
     };
-    var kind = definition["extends"] || 'element';
+    var kind = definition["extends"] || element;
 
     var MicroElement = /*#__PURE__*/function (_Class) {
       _inherits(MicroElement, _Class);
@@ -963,29 +964,27 @@ var uce = (function (exports) {
     defineProperties$1(MicroElement, statics);
     defineProperties$1(MicroElement.prototype, proto);
     var args = [tagName, MicroElement];
-    if (kind !== 'element') args.push({
+    if (kind !== element) args.push({
       "extends": kind
     });
     defineCustomElement.apply(customElements, args);
 
     function bootstrap(element) {
       if (!initialized.has(element)) {
-        initialized.set(element, true);
-
-        if (length) {
-          for (var _i = 0; _i < length; _i++) {
-            var _listeners$_i = listeners[_i],
-                _type = _listeners$_i.type,
-                _options = _listeners$_i.options;
-            element.addEventListener(_type, element, _options);
-          }
-        }
-
+        initialized.set(element, 0);
         defineProperties$1(element, {
           html: {
             value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
           }
         });
+
+        for (var _i = 0; _i < length; _i++) {
+          var _listeners$_i = listeners[_i],
+              _type = _listeners$_i.type,
+              _options = _listeners$_i.options;
+          element.addEventListener(_type, element, _options);
+        }
+
         if (init) init.call(element);
       }
     }

@@ -4,8 +4,9 @@ const {define: defineCustomElement} = customElements;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
 
 const initialized = new WeakMap;
+const element = 'element';
 
-const Class = kind => kind === 'element' ?
+const Class = kind => kind === element ?
   HTMLElement :
   document.createElement(kind).constructor
 ;
@@ -35,7 +36,7 @@ export const define = (tagName, definition) => {
       listeners.push({type, options});
       retype[type] = key;
       if (lower !== key) {
-        type = key.slice(2, 3).toLowerCase() + key.slice(3);
+        type = lower.slice(2, 3) + key.slice(3);
         retype[type] = key;
         listeners.push({type, options});
       }
@@ -71,28 +72,26 @@ export const define = (tagName, definition) => {
   if (disconnected)
     proto.disconnectedCallback = {value: disconnected};
 
-  const kind = definition.extends || 'element';
+  const kind = definition.extends || element;
   class MicroElement extends Class(kind) {};
   defineProperties(MicroElement, statics);
   defineProperties(MicroElement.prototype, proto);
   const args = [tagName, MicroElement];
-  if (kind !== 'element')
+  if (kind !== element)
     args.push({extends: kind});
   defineCustomElement.apply(customElements, args);
   function bootstrap(element) {
     if (!initialized.has(element)) {
-      initialized.set(element, true);
-      if (length) {
-        for (let i = 0; i < length; i++) {
-          const {type, options} = listeners[i];
-          element.addEventListener(type, element, options);
-        }
-      }
+      initialized.set(element, 0);
       defineProperties(element, {html: {
         value: content.bind(
           attachShadow ? element.attachShadow(attachShadow) : element
         )
       }});
+      for (let i = 0; i < length; i++) {
+        const {type, options} = listeners[i];
+        element.addEventListener(type, element, options);
+      }
       if (init)
         init.call(element);
     }
