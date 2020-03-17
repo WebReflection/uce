@@ -9,23 +9,27 @@
     catch(s){document.write('<script src="//unpkg.com/@ungap/custom-elements-builtin"><\x2fscript>')}
   else
     document.write('<script src="//unpkg.com/document-register-element"><\x2fscript>');
-  if (!document.documentElement.attachShadow)
-    document.write('<script src="//unpkg.com/attachshadow"><\x2fscript>');
-  if (this.Reflect)
+  if (document.documentElement.attachShadow)
     document.write('<script src="../new.js"><\x2fscript>');
-  else
+  else {
+    document.write('<script src="//unpkg.com/attachshadow"><\x2fscript>');
     document.write('<script src="../min.js"><\x2fscript>');
+  }
   </script>
   <script>
   uce.define('my-counter', {
+    extends: 'div',
     attachShadow: {mode: 'open'},
     init: function () {
       this.count = 0;
       this.dec = this.dec.bind(this);
       this.inc = this.inc.bind(this);
+      // this demo is for testing in IE11 too but you can simply
+      // use Babel to transpile and target legacy browsers and write
+      // this.html`...` instead directly in the render method
       this.template = [
         '<style>\
-        * {\
+        button, span {\
           font-size: 200%;\
         }\
         span {\
@@ -58,12 +62,14 @@
       this.render();
     },
     render: function () {
+      // this demo is for testing in IE11 too but you can simply
+      // use Babel to transpile and target legacy browsers
       this.html(this.template, this.dec, this.count, this.inc);
     }
   });
   </script>
 </head>
 <body>
-  <my-counter></my-counter>
+  <div is="my-counter"></div>
 </body>
 </html>
