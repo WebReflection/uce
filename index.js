@@ -498,7 +498,7 @@ var uce = (function (exports) {
   var handleAttribute = function handleAttribute(node, name) {
     // hooks and ref
     if (name === 'ref') return function (ref) {
-      ref.current = node;
+      if (typeof ref === 'function') ref(node);else ref.current = node;
     }; // direct setters
 
     if (name.slice(0, 1) === '.') {
