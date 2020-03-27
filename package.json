@@ -22,15 +22,15 @@
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.8.7",
-    "@babel/preset-env": "^7.8.7",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
     "@ungap/degap": "^0.1.7",
     "ascjs": "^3.1.2",
-    "basichtml": "^2.1.4",
-    "coveralls": "^3.0.9",
+    "basichtml": "^2.2.1",
+    "coveralls": "^3.0.11",
     "drop-babel-typeof": "^1.0.3",
     "nyc": "^15.0.0",
-    "rollup": "^2.0.6",
+    "rollup": "^2.2.0",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-includepaths": "^0.2.3",
     "rollup-plugin-node-resolve": "^5.2.0",
@@ -40,7 +40,7 @@
   "module": "esm/index.js",
   "unpkg": "min.js",
   "dependencies": {
-    "uhtml": "^1.8.0"
+    "uhtml": "^1.9.0"
   },
   "repository": {
     "type": "git",

@@ -40,6 +40,19 @@ var uce = (function (exports) {
     return _setPrototypeOf(o, p);
   }
 
+  function _isNativeReflectConstruct() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function _assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -54,6 +67,23 @@ var uce = (function (exports) {
     }
 
     return _assertThisInitialized(self);
+  }
+
+  function _createSuper(Derived) {
+    return function () {
+      var Super = _getPrototypeOf(Derived),
+          result;
+
+      if (_isNativeReflectConstruct()) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+
+      return _possibleConstructorReturn(this, result);
+    };
   }
 
   var umap = (function (_) {
@@ -80,13 +110,7 @@ var uce = (function (exports) {
   var trimEnd = /\s+$/;
 
   var isNode = function isNode(template, i) {
-    while (i--) {
-      var chunk = template[i];
-      if (node.test(chunk)) return true;
-      if (notNode.test(chunk)) return false;
-    }
-
-    return false;
+    return 0 < i-- && (node.test(template[i]) || !notNode.test(template[i]) && isNode(template, i));
   };
 
   var regular = function regular(original, name, extra) {
@@ -95,18 +119,20 @@ var uce = (function (exports) {
 
   var instrument = (function (template, prefix, svg) {
     var text = [];
+    var length = template.length;
 
-    var _loop = function _loop(i, length) {
-      var chunk = template[i];
-      if (attr.test(chunk) && isNode(template, i + 1)) text.push(chunk.replace(attr, function (_, $1, $2) {
-        return "".concat(prefix).concat(i, "=").concat($2 ? $2 : '"').concat($1).concat($2 ? '' : '"');
-      }));else if (i + 1 < length) text.push(chunk, "<!--".concat(prefix).concat(i, "-->"));else text.push(chunk);
+    var _loop = function _loop(i) {
+      var chunk = template[i - 1];
+      text.push(attr.test(chunk) && isNode(template, i) ? chunk.replace(attr, function (_, $1, $2) {
+        return "".concat(prefix).concat(i - 1, "=").concat($2 || '"').concat($1).concat($2 ? '' : '"');
+      }) : "".concat(chunk, "<!--").concat(prefix).concat(i - 1, "-->"));
     };
 
-    for (var i = 0, length = template.length; i < length; i++) {
-      _loop(i, length);
+    for (var i = 1; i < length; i++) {
+      _loop(i);
     }
 
+    text.push(template[length - 1]);
     var output = text.join('').trim();
     return svg ? output : output.replace(selfClosing, regular);
   });
@@ -317,12 +343,84 @@ var uce = (function (exports) {
     return b;
   });
 
+  var aria = function aria(node) {
+    return function (value) {
+      for (var key in value) {
+        node.setAttribute(key === 'role' ? key : "aria-".concat(key), value[key]);
+      }
+    };
+  };
+  var attribute = function attribute(node, name) {
+    var oldValue,
+        orphan = true;
+    var attributeNode = document.createAttribute(name);
+    return function (newValue) {
+      if (oldValue !== newValue) {
+        oldValue = newValue;
+
+        if (oldValue == null) {
+          if (!orphan) {
+            node.removeAttributeNode(attributeNode);
+            orphan = true;
+          }
+        } else {
+          attributeNode.value = newValue;
+
+          if (orphan) {
+            node.setAttributeNode(attributeNode);
+            orphan = false;
+          }
+        }
+      }
+    };
+  };
+  var data = function data(_ref) {
+    var dataset = _ref.dataset;
+    return function (value) {
+      for (var key in value) {
+        dataset[key] = value[key];
+      }
+    };
+  };
+  var event = function event(node, name) {
+    var oldValue,
+        type = name.slice(2);
+    if (!(name in node) && name.toLowerCase() in node) type = type.toLowerCase();
+    return function (newValue) {
+      var info = isArray(newValue) ? newValue : [newValue, false];
+
+      if (oldValue !== info[0]) {
+        if (oldValue) node.removeEventListener(type, oldValue, info[1]);
+        if (oldValue = info[0]) node.addEventListener(type, oldValue, info[1]);
+      }
+    };
+  };
+  var ref = function ref(node) {
+    return function (value) {
+      if (typeof value === 'function') value(node);else value.current = node;
+    };
+  };
+  var setter = function setter(node, key) {
+    return function (value) {
+      node[key] = value;
+    };
+  };
+  var text = function text(node) {
+    var oldValue;
+    return function (newValue) {
+      if (oldValue != newValue) {
+        oldValue = newValue;
+        node.textContent = newValue == null ? '' : newValue;
+      }
+    };
+  };
+
   /*! (c) Andrea Giammarchi - ISC */
   var createContent = function (document) {
 
     var FRAGMENT = 'fragment';
     var TEMPLATE = 'template';
-    var HAS_CONTENT = 'content' in create(TEMPLATE);
+    var HAS_CONTENT = ('content' in create(TEMPLATE));
     var createHTML = HAS_CONTENT ? function (html) {
       var template = create(TEMPLATE);
       template.innerHTML = html;
@@ -372,8 +470,9 @@ var uce = (function (exports) {
     }
   }(document);
 
-  var reducePath = function reducePath(node, i) {
-    return node.childNodes[i];
+  var reducePath = function reducePath(_ref, i) {
+    var childNodes = _ref.childNodes;
+    return childNodes[i];
   }; // from a fragment container, create an array of indexes
   // related to its child nodes, so that it's possible
   // to retrieve later on exact node via reducePath
@@ -384,7 +483,7 @@ var uce = (function (exports) {
         parentNode = _node.parentNode;
 
     while (parentNode) {
-      path.unshift(indexOf.call(parentNode.childNodes, node));
+      path.push(indexOf.call(parentNode.childNodes, node));
       node = parentNode;
       parentNode = node.parentNode;
     }
@@ -436,8 +535,10 @@ var uce = (function (exports) {
   // content for such interpolation/hole should be updated
 
 
-  var handleAnything = function handleAnything(comment, nodes) {
-    var oldValue, text;
+  var handleAnything = function handleAnything(comment) {
+    var oldValue,
+        text,
+        nodes = [];
 
     var anyContent = function anyContent(newValue) {
       switch (typeof(newValue)) {
@@ -447,8 +548,7 @@ var uce = (function (exports) {
         case 'boolean':
           if (oldValue !== newValue) {
             oldValue = newValue;
-            if (!text) text = document.createTextNode('');
-            text.textContent = newValue;
+            if (text) text.textContent = newValue;else text = document.createTextNode(newValue);
             nodes = diff(comment, nodes, [text]);
           }
 
@@ -458,7 +558,7 @@ var uce = (function (exports) {
         case 'object':
         case 'undefined':
           if (newValue == null) {
-            if (oldValue) {
+            if (oldValue != newValue) {
               oldValue = newValue;
               nodes = diff(comment, nodes, []);
             }
@@ -473,15 +573,18 @@ var uce = (function (exports) {
             if (newValue.length === 0) nodes = diff(comment, nodes, []); // or diffed, if these contains nodes or "wires"
             else if (typeof(newValue[0]) === 'object') nodes = diff(comment, nodes, newValue); // in all other cases the content is stringified as is
               else anyContent(String(newValue));
+            break;
           } // if the new value is a DOM node, or a wire, and it's
           // different from the one already live, then it's diffed.
           // if the node is a fragment, it's appended once via its childNodes
           // There is no `else` here, meaning if the content
           // is not expected one, nothing happens, as easy as that.
-          else if ('ELEMENT_NODE' in newValue && newValue !== oldValue) {
-              oldValue = newValue;
-              nodes = diff(comment, nodes, newValue.nodeType === 11 ? slice.call(newValue.childNodes) : [newValue]);
-            }
+
+
+          if ('ELEMENT_NODE' in newValue && oldValue !== newValue) {
+            oldValue = newValue;
+            nodes = diff(comment, nodes, newValue.nodeType === 11 ? slice.call(newValue.childNodes) : [newValue]);
+          }
 
       }
     };
@@ -489,6 +592,8 @@ var uce = (function (exports) {
     return anyContent;
   }; // attributes can be:
   //  * ref=${...}      for hooks and other purposes
+  //  * aria=${...}     for aria attributes
+  //  * data=${...}     for dataset related attributes
   //  * .setter=${...}  for Custom Elements setters or nodes with setters
   //                    such as buttons, details, options, select, etc
   //  * onevent=${...}  to automatically handle event listeners
@@ -496,70 +601,12 @@ var uce = (function (exports) {
 
 
   var handleAttribute = function handleAttribute(node, name) {
-    // hooks and ref
-    if (name === 'ref') return function (ref) {
-      if (typeof ref === 'function') ref(node);else ref.current = node;
-    }; // direct setters
-
-    if (name.slice(0, 1) === '.') {
-      var setter = name.slice(1);
-      return function (value) {
-        node[setter] = value;
-      };
-    }
-
-    var oldValue; // events
-
-    if (name.slice(0, 2) === 'on') {
-      var type = name.slice(2);
-      if (!(name in node) && name.toLowerCase() in node) type = type.toLowerCase();
-      return function (newValue) {
-        var info = isArray(newValue) ? newValue : [newValue, false];
-
-        if (oldValue !== info[0]) {
-          if (oldValue) node.removeEventListener(type, oldValue, info[1]);
-          if (oldValue = info[0]) node.addEventListener(type, oldValue, info[1]);
-        }
-      };
-    } // all other cases
-
-
-    var noOwner = true;
-    var attribute = document.createAttribute(name);
-    return function (newValue) {
-      if (oldValue !== newValue) {
-        oldValue = newValue;
-
-        if (oldValue == null) {
-          if (!noOwner) {
-            node.removeAttributeNode(attribute);
-            noOwner = true;
-          }
-        } else {
-          attribute.value = newValue; // There is no else case here.
-          // If the attribute has no owner, it's set back.
-
-          if (noOwner) {
-            node.setAttributeNode(attribute);
-            noOwner = false;
-          }
-        }
-      }
-    };
-  }; // style and textarea nodes can change only their text
-  // without any possibility to accept child nodes.
-  // in these two cases the content is simply updated, or cleaned,
-  // accordingly with the passed value.
-
-
-  var handleText = function handleText(node) {
-    var oldValue;
-    return function (newValue) {
-      if (oldValue !== newValue) {
-        oldValue = newValue;
-        node.textContent = newValue == null ? '' : newValue;
-      }
-    };
+    if (name === 'ref') return ref(node);
+    if (name === 'aria') return aria(node);
+    if (name === 'data') return data(node);
+    if (name.slice(0, 1) === '.') return setter(node, name.slice(1));
+    if (name.slice(0, 2) === 'on') return event(node, name);
+    return attribute(node, name);
   }; // each mapped update carries the update type and its path
   // the type is either node, attribute, or text, while
   // the path is how to retrieve the related node to update.
@@ -569,8 +616,8 @@ var uce = (function (exports) {
   function handlers(options) {
     var type = options.type,
         path = options.path;
-    var node = path.reduce(reducePath, this);
-    return type === 'node' ? handleAnything(node, []) : type === 'attr' ? handleAttribute(node, options.name) : handleText(node);
+    var node = path.reduceRight(reducePath, this);
+    return type === 'node' ? handleAnything(node) : type === 'attr' ? handleAttribute(node, options.name) : text(node);
   }
 
   // that contain the related unique id. In the attribute cases
@@ -953,10 +1000,12 @@ var uce = (function (exports) {
     var MicroElement = /*#__PURE__*/function (_Class) {
       _inherits(MicroElement, _Class);
 
+      var _super = _createSuper(MicroElement);
+
       function MicroElement() {
         _classCallCheck(this, MicroElement);
 
-        return _possibleConstructorReturn(this, _getPrototypeOf(MicroElement).apply(this, arguments));
+        return _super.apply(this, arguments);
       }
 
       return MicroElement;
