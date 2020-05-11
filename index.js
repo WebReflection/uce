@@ -70,11 +70,13 @@ var uce = (function (exports) {
   }
 
   function _createSuper(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
     return function () {
       var Super = _getPrototypeOf(Derived),
           result;
 
-      if (_isNativeReflectConstruct()) {
+      if (hasNativeReflectConstruct) {
         var NewTarget = _getPrototypeOf(this).constructor;
 
         result = Reflect.construct(Super, arguments, NewTarget);
@@ -349,7 +351,7 @@ var uce = (function (exports) {
 
         if (oldValue == null) {
           if (!orphan) {
-            node.removeAttributeNodeNS(attributeNode);
+            node.removeAttributeNode(attributeNode);
             orphan = true;
           }
         } else {
