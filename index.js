@@ -920,9 +920,10 @@ var uce = (function (exports) {
       keys = Object.keys;
   var initialized = new WeakMap();
   var element = 'element';
+  var constructors = umap(new Map());
 
   var Class = function Class(kind) {
-    return kind === element ? HTMLElement : document.createElement(kind).constructor;
+    return kind === element ? HTMLElement : constructors.get(kind) || constructors.set(kind, document.createElement(kind).constructor);
   };
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
@@ -931,7 +932,8 @@ var uce = (function (exports) {
         disconnected = definition.disconnected,
         handleEvent = definition.handleEvent,
         init = definition.init,
-        observedAttributes = definition.observedAttributes;
+        observedAttributes = definition.observedAttributes,
+        props = definition.props;
     var statics = {};
     var proto = {};
     var listeners = [];
@@ -974,6 +976,20 @@ var uce = (function (exports) {
     if (length && !handleEvent) proto.handleEvent = {
       value: function value(event) {
         this[retype[event.type]](event);
+      }
+    };
+    if (!props) proto.props = {
+      get: function get() {
+        var props = {};
+
+        for (var attributes = this.attributes, _length2 = attributes.length, _i = 0; _i < _length2; _i++) {
+          var _attributes$_i = attributes[_i],
+              name = _attributes$_i.name,
+              value = _attributes$_i.value;
+          props[name] = value;
+        }
+
+        return props;
       }
     };
     if (observedAttributes) statics.observedAttributes = {
@@ -1026,8 +1042,8 @@ var uce = (function (exports) {
           }
         });
 
-        for (var _i = 0; _i < length; _i++) {
-          var _listeners$_i = listeners[_i],
+        for (var _i2 = 0; _i2 < length; _i2++) {
+          var _listeners$_i = listeners[_i2],
               _type = _listeners$_i.type,
               _options = _listeners$_i.options;
           element.addEventListener(_type, element, _options);

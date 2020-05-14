@@ -1,15 +1,20 @@
 'use strict';
 const {render, html, svg} = require('uhtml');
+const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 
 const {define: defineCustomElement} = customElements;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
 
 const initialized = new WeakMap;
 const element = 'element';
+const constructors = umap(new Map);
 
 const Class = kind => kind === element ?
   HTMLElement :
-  document.createElement(kind).constructor
+  (
+    constructors.get(kind) ||
+    constructors.set(kind, document.createElement(kind).constructor)
+  )
 ;
 
 exports.render = render;
@@ -24,7 +29,8 @@ const define = (tagName, definition) => {
     disconnected,
     handleEvent,
     init,
-    observedAttributes
+    observedAttributes,
+    props
   } = definition;
   const statics = {};
   const proto = {};
@@ -56,6 +62,16 @@ const define = (tagName, definition) => {
   if (length && !handleEvent)
     proto.handleEvent = {value(event) {
       this[retype[event.type]](event);
+    }};
+
+  if (!props)
+    proto.props = {get() {
+      const props = {};
+      for (let {attributes} = this, {length} = attributes, i = 0; i < length; i++) {
+        const {name, value} = attributes[i];
+        props[name] = value;
+      }
+      return props;
     }};
 
   if (observedAttributes)

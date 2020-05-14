@@ -32,6 +32,12 @@ define('my-component', {
     // it will populate the shadow root, even if closed
     // or simply the node, if no attachShadow is defined
     this.html`<h1>Hello 👋 µce</h1>`;
+    // this.props resolves all attributes by name
+    // and returns their values (always as string)
+    // but it's handy to reach custom elements attributes
+    // without any real need to observe these, i.e.
+    // <my-ce name="ag" />
+    console.log(this.props.name); // "ag"
   },
 
   // if specified, it renders within its Shadow DOM

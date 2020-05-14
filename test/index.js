@@ -6,7 +6,7 @@ const uhtml = require('uhtml');
 uhtml.html = function () { return ''; };
 const {define} = require('../cjs');
 
-define('el-0', {attachShadow: {mode: 'open'}});
+define('el-0', {props: {}, attachShadow: {mode: 'open'}});
 define('el-1', {init() {}});
 define('el-2', {onClick() {}, ontest() {}, onCamelCase() {}});
 define('el-3', {onClick() {}, onClickOptions: true});
@@ -27,6 +27,8 @@ const El1 = customElements.get('el-1');
 const el1 = new El1(document);
 el1.connectedCallback();
 el1.attributeChangedCallback();
+el1.setAttribute('test', 123);
+console.assert(el1.props.test == 123, 'props working');
 
 const El2 = customElements.get('el-2');
 const el2 = new El2(document);
