@@ -84,6 +84,28 @@ define('my-component', {
 ```
 
 
+### How to avoid bundling µce per each component?
+
+This module reserves, in the Custom Elements Registry a `uce-lib` class, which only purpose is to provide all exports as static getters.
+
+```js
+// whenever uce library is loaded
+customElements.whenDefined('uce-lib').then(() => {
+
+  // grab all utilities from the uce-lib Class
+  const {define, render, html, svg} = customElements.get('uce-lib');
+
+  // that's it: ready to go 🎉
+  define('my-component', {
+    init() {
+      console.log('this is awesome!');
+    }
+  });
+});
+```
+
+
+
 ### Without classes, how does one define private properties?
 
 Private properties can be created via a _WeakMap_, which is indeed how _Babel_ transforms these anyway.

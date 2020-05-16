@@ -9,6 +9,22 @@ var uce = (function (exports) {
     }
   }
 
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
   function _inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
@@ -912,8 +928,8 @@ var uce = (function (exports) {
     return where;
   };
 
-  var _customElements = customElements,
-      defineCustomElement = _customElements.define;
+  var CE = customElements;
+  var defineCustomElement = CE.define;
   var create$1 = Object.create,
       defineProperties$1 = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
@@ -1031,7 +1047,7 @@ var uce = (function (exports) {
     if (kind !== element) args.push({
       "extends": kind
     });
-    defineCustomElement.apply(customElements, args);
+    defineCustomElement.apply(CE, args);
 
     function bootstrap(element) {
       if (!initialized.has(element)) {
@@ -1053,6 +1069,43 @@ var uce = (function (exports) {
       }
     }
   };
+  /* istanbul ignore else */
+
+  if (!CE.get('uce-lib')) CE.define('uce-lib', /*#__PURE__*/function (_Class2) {
+    _inherits(_class, _Class2);
+
+    var _super2 = _createSuper(_class);
+
+    function _class() {
+      _classCallCheck(this, _class);
+
+      return _super2.apply(this, arguments);
+    }
+
+    _createClass(_class, null, [{
+      key: "define",
+      get: function get() {
+        return define;
+      }
+    }, {
+      key: "render",
+      get: function get() {
+        return render;
+      }
+    }, {
+      key: "html",
+      get: function get() {
+        return html;
+      }
+    }, {
+      key: "svg",
+      get: function get() {
+        return svg;
+      }
+    }]);
+
+    return _class;
+  }(Class(element)));
 
   function content() {
     return render(this, html.apply(null, arguments));

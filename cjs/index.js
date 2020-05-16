@@ -2,7 +2,8 @@
 const {render, html, svg} = require('uhtml');
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 
-const {define: defineCustomElement} = customElements;
+const CE = customElements;
+const {define: defineCustomElement} = CE;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
 
 const initialized = new WeakMap;
@@ -98,7 +99,7 @@ const define = (tagName, definition) => {
   const args = [tagName, MicroElement];
   if (kind !== element)
     args.push({extends: kind});
-  defineCustomElement.apply(customElements, args);
+  defineCustomElement.apply(CE, args);
   function bootstrap(element) {
     if (!initialized.has(element)) {
       initialized.set(element, 0);
@@ -117,6 +118,15 @@ const define = (tagName, definition) => {
   }
 };
 exports.define = define;
+
+/* istanbul ignore else */
+if (!CE.get('uce-lib'))
+  CE.define('uce-lib', class extends Class(element) {
+    static get define() { return define; }
+    static get render() { return render; }
+    static get html() { return html; }
+    static get svg() { return svg; }
+  });
 
 function content() {
   return render(this, html.apply(null, arguments));

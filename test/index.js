@@ -49,3 +49,12 @@ const El7 = customElements.get('el-7');
 const el7 = new El7(document);
 el7.connectedCallback();
 el7.html``;
+
+customElements.whenDefined('uce-lib').then(() => {
+  const uce = customElements.get('uce-lib');
+  console.assert(uce.define === define, 'define is OK');
+  console.assert(typeof uce.html === 'function', 'html is OK');
+  console.assert(typeof uce.svg === 'function', 'svg is OK');
+  console.assert(typeof uce.render === 'function', 'render is OK');
+  console.log('OK');
+});
