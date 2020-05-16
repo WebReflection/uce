@@ -50,15 +50,18 @@ const el7 = new El7(document);
 el7.connectedCallback();
 el7.html``;
 
-// https://github.com/whatwg/html/issues/5552
+/* https://github.com/whatwg/html/issues/5552
 ((c,w,m)=>{
   m=c[w];c[w]=n=>m.call(c,n).then(()=>c.get(n));
 })(customElements,'whenDefined');
+//*/
 
-customElements.whenDefined('uce-lib').then(uce => {
-  console.assert(uce.define === define, 'define is OK');
-  console.assert(typeof uce.html === 'function', 'html is OK');
-  console.assert(typeof uce.svg === 'function', 'svg is OK');
-  console.assert(typeof uce.render === 'function', 'render is OK');
-  console.log('OK');
-});
+customElements.whenDefined('uce-lib').then(
+  ({html, svg, render, define: udefine} = customElements.get('uce-lib')) => {
+    console.assert(udefine === define, 'define is OK');
+    console.assert(typeof html === 'function', 'html is OK');
+    console.assert(typeof svg === 'function', 'svg is OK');
+    console.assert(typeof render === 'function', 'render is OK');
+    console.log('OK');
+  }
+);
