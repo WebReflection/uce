@@ -50,8 +50,12 @@ const el7 = new El7(document);
 el7.connectedCallback();
 el7.html``;
 
-customElements.whenDefined('uce-lib').then(() => {
-  const uce = customElements.get('uce-lib');
+// https://github.com/whatwg/html/issues/5552
+((c,w,m)=>{
+  m=c[w];c[w]=n=>m.call(c,n).then(()=>c.get(n));
+})(customElements,'whenDefined');
+
+customElements.whenDefined('uce-lib').then(uce => {
   console.assert(uce.define === define, 'define is OK');
   console.assert(typeof uce.html === 'function', 'html is OK');
   console.assert(typeof uce.svg === 'function', 'svg is OK');
