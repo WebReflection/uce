@@ -121,6 +121,10 @@ exports.define = define;
 
 /* istanbul ignore else */
 if (!CE.get('uce-lib'))
+  // theoretically this could be just class { ... }
+  // however, if there is for whatever reason a <uce-lib>
+  // element on the page, it will break once the registry
+  // will try to upgrade such element so ... HTMLElement it is.
   CE.define('uce-lib', class extends Class(element) {
     static get define() { return define; }
     static get render() { return render; }

@@ -1071,41 +1071,45 @@ var uce = (function (exports) {
   };
   /* istanbul ignore else */
 
-  if (!CE.get('uce-lib')) CE.define('uce-lib', /*#__PURE__*/function (_Class2) {
-    _inherits(_class, _Class2);
+  if (!CE.get('uce-lib')) // theoretically this could be just class { ... }
+    // however, if there is for whatever reason a <uce-lib>
+    // element on the page, it will break once the registry
+    // will try to upgrade such element so ... HTMLElement it is.
+    CE.define('uce-lib', /*#__PURE__*/function (_Class2) {
+      _inherits(_class, _Class2);
 
-    var _super2 = _createSuper(_class);
+      var _super2 = _createSuper(_class);
 
-    function _class() {
-      _classCallCheck(this, _class);
+      function _class() {
+        _classCallCheck(this, _class);
 
-      return _super2.apply(this, arguments);
-    }
-
-    _createClass(_class, null, [{
-      key: "define",
-      get: function get() {
-        return define;
+        return _super2.apply(this, arguments);
       }
-    }, {
-      key: "render",
-      get: function get() {
-        return render;
-      }
-    }, {
-      key: "html",
-      get: function get() {
-        return html;
-      }
-    }, {
-      key: "svg",
-      get: function get() {
-        return svg;
-      }
-    }]);
 
-    return _class;
-  }(Class(element)));
+      _createClass(_class, null, [{
+        key: "define",
+        get: function get() {
+          return define;
+        }
+      }, {
+        key: "render",
+        get: function get() {
+          return render;
+        }
+      }, {
+        key: "html",
+        get: function get() {
+          return html;
+        }
+      }, {
+        key: "svg",
+        get: function get() {
+          return svg;
+        }
+      }]);
+
+      return _class;
+    }(Class(element)));
 
   function content() {
     return render(this, html.apply(null, arguments));
