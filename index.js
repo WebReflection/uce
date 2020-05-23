@@ -934,12 +934,17 @@ var uce = (function (exports) {
       defineProperties$1 = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
       keys = Object.keys;
-  var constructors = umap(new Map());
-  var initialized = new WeakMap();
   var element = 'element';
+  var constructors = umap(new Map([[element, {
+    c: HTMLElement,
+    e: element
+  }]]));
 
-  var Class = function Class(kind) {
-    return kind === element ? HTMLElement : constructors.get(kind) || constructors.set(kind, document.createElement(kind).constructor);
+  var info = function info(e) {
+    return constructors.get(e) || constructors.set(e, {
+      c: document.createElement(e).constructor,
+      e: e
+    });
   };
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
@@ -950,6 +955,7 @@ var uce = (function (exports) {
         init = definition.init,
         observedAttributes = definition.observedAttributes,
         props = definition.props;
+    var initialized = new WeakMap();
     var statics = {};
     var proto = {};
     var listeners = [];
@@ -1026,10 +1032,13 @@ var uce = (function (exports) {
     if (disconnected) proto.disconnectedCallback = {
       value: disconnected
     };
-    var kind = definition["extends"] || element;
 
-    var MicroElement = /*#__PURE__*/function (_Class) {
-      _inherits(MicroElement, _Class);
+    var _info = info(definition["extends"] || element),
+        c = _info.c,
+        e = _info.e;
+
+    var MicroElement = /*#__PURE__*/function (_c) {
+      _inherits(MicroElement, _c);
 
       var _super = _createSuper(MicroElement);
 
@@ -1040,15 +1049,18 @@ var uce = (function (exports) {
       }
 
       return MicroElement;
-    }(Class(kind));
+    }(c);
     defineProperties$1(MicroElement, statics);
     defineProperties$1(MicroElement.prototype, proto);
     var args = [tagName, MicroElement];
-    if (kind !== element) args.push({
-      "extends": kind
+    if (e !== element) args.push({
+      "extends": e
     });
     defineCustomElement.apply(CE, args);
-    constructors.set(tagName, MicroElement);
+    constructors.set(tagName, {
+      c: MicroElement,
+      e: e
+    });
 
     function bootstrap(element) {
       if (!initialized.has(element)) {
@@ -1076,8 +1088,8 @@ var uce = (function (exports) {
     // however, if there is for whatever reason a <uce-lib>
     // element on the page, it will break once the registry
     // will try to upgrade such element so ... HTMLElement it is.
-    CE.define('uce-lib', /*#__PURE__*/function (_Class2) {
-      _inherits(_class, _Class2);
+    CE.define('uce-lib', /*#__PURE__*/function (_info$c) {
+      _inherits(_class, _info$c);
 
       var _super2 = _createSuper(_class);
 
@@ -1110,7 +1122,7 @@ var uce = (function (exports) {
       }]);
 
       return _class;
-    }(Class(element)));
+    }(info(element).c));
 
   function content() {
     return render(this, html.apply(null, arguments));

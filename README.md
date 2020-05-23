@@ -128,7 +128,12 @@ define('ce-with-privates', {
 
 ### Without classes, how does one extend other components?
 
-Object literals have been used as mixin for a very long time, and the pattern in here would likely be very similar.
+There are at least two ways to extend an _uce_ component:
+
+  * define via _uce_ your base component, and use `extends: "base-comp-name"` to extend it (built-ins supported!)
+  * use one or more mixin through object literals
+
+Object literals have indeed been used as mixin for a very long time, and the pattern with _uce_ would be very similar.
 
 The only warning is that `Object.assign`, as well as object `{...spread}`, lose getters and setters in the process, so that if you want to extend more complex components, you should consider using [assignProperties](https://github.com/WebReflection/assign-properties#readme), or a similar helper.
 

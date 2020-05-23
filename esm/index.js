@@ -5,17 +5,13 @@ const CE = customElements;
 const {define: defineCustomElement} = CE;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
 
-const constructors = umap(new Map);
-const initialized = new WeakMap;
 const element = 'element';
+const constructors = umap(new Map([[element, {c: HTMLElement, e: element}]]));
 
-const Class = kind => kind === element ?
-  HTMLElement :
-  (
-    constructors.get(kind) ||
-    constructors.set(kind, document.createElement(kind).constructor)
-  )
-;
+const info = e => constructors.get(e) || constructors.set(e, {
+  c: document.createElement(e).constructor,
+  e
+});
 
 export {render, html, svg};
 
@@ -30,6 +26,7 @@ export const define = (tagName, definition) => {
     observedAttributes,
     props
   } = definition;
+  const initialized = new WeakMap;
   const statics = {};
   const proto = {};
   const listeners = [];
@@ -89,15 +86,15 @@ export const define = (tagName, definition) => {
   if (disconnected)
     proto.disconnectedCallback = {value: disconnected};
 
-  const kind = definition.extends || element;
-  class MicroElement extends Class(kind) {};
+  const {c, e} = info(definition.extends || element);
+  class MicroElement extends c {};
   defineProperties(MicroElement, statics);
   defineProperties(MicroElement.prototype, proto);
   const args = [tagName, MicroElement];
-  if (kind !== element)
-    args.push({extends: kind});
+  if (e !== element)
+    args.push({extends: e});
   defineCustomElement.apply(CE, args);
-  constructors.set(tagName, MicroElement);
+  constructors.set(tagName, {c: MicroElement, e});
   function bootstrap(element) {
     if (!initialized.has(element)) {
       initialized.set(element, 0);
@@ -122,7 +119,7 @@ if (!CE.get('uce-lib'))
   // however, if there is for whatever reason a <uce-lib>
   // element on the page, it will break once the registry
   // will try to upgrade such element so ... HTMLElement it is.
-  CE.define('uce-lib', class extends Class(element) {
+  CE.define('uce-lib', class extends info(element).c {
     static get define() { return define; }
     static get render() { return render; }
     static get html() { return html; }
