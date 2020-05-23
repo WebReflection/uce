@@ -6,9 +6,9 @@ const CE = customElements;
 const {define: defineCustomElement} = CE;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
 
+const constructors = umap(new Map);
 const initialized = new WeakMap;
 const element = 'element';
-const constructors = umap(new Map);
 
 const Class = kind => kind === element ?
   HTMLElement :
@@ -100,6 +100,7 @@ const define = (tagName, definition) => {
   if (kind !== element)
     args.push({extends: kind});
   defineCustomElement.apply(CE, args);
+  constructors.set(tagName, MicroElement);
   function bootstrap(element) {
     if (!initialized.has(element)) {
       initialized.set(element, 0);

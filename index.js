@@ -934,9 +934,9 @@ var uce = (function (exports) {
       defineProperties$1 = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
       keys = Object.keys;
+  var constructors = umap(new Map());
   var initialized = new WeakMap();
   var element = 'element';
-  var constructors = umap(new Map());
 
   var Class = function Class(kind) {
     return kind === element ? HTMLElement : constructors.get(kind) || constructors.set(kind, document.createElement(kind).constructor);
@@ -1048,6 +1048,7 @@ var uce = (function (exports) {
       "extends": kind
     });
     defineCustomElement.apply(CE, args);
+    constructors.set(tagName, MicroElement);
 
     function bootstrap(element) {
       if (!initialized.has(element)) {
