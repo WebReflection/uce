@@ -88,7 +88,7 @@ var uce = (function (exports) {
   function _createSuper(Derived) {
     var hasNativeReflectConstruct = _isNativeReflectConstruct();
 
-    return function () {
+    return function _createSuperInternal() {
       var Super = _getPrototypeOf(Derived),
           result;
 
@@ -612,7 +612,7 @@ var uce = (function (exports) {
   ) {
     if (name === 'ref') return ref(node);
     if (name === 'aria') return aria(node);
-    if (name === 'data') return data(node);
+    if (name === '.dataset') return data(node);
     if (name.slice(0, 1) === '.') return setter(node, name.slice(1));
     if (name.slice(0, 2) === 'on') return event(node, name);
     return attribute(node, name
