@@ -27,7 +27,7 @@ define('very-important', {
 });
 ```
 
-If the element doesn't extend a built-in, the received `selector` will simply by its name, otherwise the built-in name with its `[is="..."]` attribute.
+If the element doesn't extend a built-in, the received `selector` will simply be its name, otherwise it'll be the built-in name with its `[is="..."]` attribute.
 
 
 ## API In A Nutshell
