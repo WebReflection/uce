@@ -29,7 +29,7 @@ define('very-important', {
 
 If the element doesn't extend a built-in, the received `selector` will simply be its name, otherwise it'll be the built-in name with its `[is="..."]` attribute.
 
-**Please note** the `style` won't interfere, or be attached anyhow, with the regular `element.style` or `this.style`, within a class, which is actually why I've chosen that name, so it's clear it's about the generic class/component style, and not its property.
+**Please note** the `style` won't interfere, or be attached anyhow, with the regular `element.style` or `this.style`, within a method, which is actually why I've chosen that name, so it's clear it's about the generic class/component style, and not its property.
 
 
 ## API In A Nutshell
