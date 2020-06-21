@@ -9,6 +9,27 @@
 **[µhtml](https://github.com/WebReflection/uhtml#readme)** based Custom Elements.
 
 
+### New in v1.1
+
+So far, the only missing utility for *non* Shadow DOM cases, is a way to define *once* a generic *style* associated with a component, which is why the special `style: (selector) => css` property has been added, so that any component can automatically define any specific style, using the `selector` to confine inner nodes directives.
+
+```js
+define('very-important', {
+  style: sel => `
+    ${sel} {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    ${sel}:hover {
+      font-size: 2rem;
+    }
+  `
+});
+```
+
+If the element doesn't extend a built-in, the received `selector` will simply by its name, otherwise the built-in name with its `[is="..."]` attribute.
+
+
 ## API In A Nutshell
 
 _<em>µ</em>ce_ exports `render`, `html`, and `svg`, from _<em>µ</em>html_, plus its own way to `define` components.
@@ -23,6 +44,14 @@ define('my-component', {
   // if specified, it can extend built-ins too.
   // by default it's 'element', as HTMLElement
   extends: 'div',
+
+  // if specified, it injects once per class definition
+  // a <style> element in the document <head>.
+  // In this case, selector will be the string:
+  // div[is="my-component"]
+  style: selector => `${selector} {
+    font-weight: bold;
+  }`,
 
   // if specified, it's like the constructor
   // it's granted to be invoked *only once* on bootstrap

@@ -941,9 +941,13 @@ var uce = (function (exports) {
     e: element
   }]]));
 
+  var el = function el(name) {
+    return document.createElement(name);
+  };
+
   var info = function info(e) {
     return constructors.get(e) || constructors.set(e, {
-      c: document.createElement(e).constructor,
+      c: el(e).constructor,
       e: e
     });
   };
@@ -955,7 +959,8 @@ var uce = (function (exports) {
         handleEvent = definition.handleEvent,
         init = definition.init,
         observedAttributes = definition.observedAttributes,
-        props = definition.props;
+        props = definition.props,
+        style = definition.style;
     var initialized = new WeakMap();
     var statics = {};
     var proto = {};
@@ -988,6 +993,7 @@ var uce = (function (exports) {
       switch (key) {
         case 'attachShadow':
         case 'observedAttributes':
+        case 'style':
           break;
 
         default:
@@ -1062,6 +1068,7 @@ var uce = (function (exports) {
       c: MicroElement,
       e: e
     });
+    if (style) document.head.appendChild(el('style')).textContent = style(e === element ? tagName : e + '[is="' + tagName + '"]');
 
     function bootstrap(element) {
       if (!initialized.has(element)) {

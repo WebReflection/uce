@@ -8,8 +8,10 @@ const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
 const element = 'element';
 const constructors = umap(new Map([[element, {c: HTMLElement, e: element}]]));
 
+const el = name => document.createElement(name);
+
 const info = e => constructors.get(e) || constructors.set(e, {
-  c: document.createElement(e).constructor,
+  c: el(e).constructor,
   e
 });
 
@@ -24,7 +26,8 @@ export const define = (tagName, definition) => {
     handleEvent,
     init,
     observedAttributes,
-    props
+    props,
+    style
   } = definition;
   const initialized = new WeakMap;
   const statics = {};
@@ -48,6 +51,7 @@ export const define = (tagName, definition) => {
     switch (key) {
       case 'attachShadow':
       case 'observedAttributes':
+      case 'style':
         break;
       default:
         proto[key] = getOwnPropertyDescriptor(definition, key);
@@ -95,6 +99,10 @@ export const define = (tagName, definition) => {
     args.push({extends: e});
   defineCustomElement.apply(CE, args);
   constructors.set(tagName, {c: MicroElement, e});
+  if (style)
+    document.head.appendChild(el('style')).textContent = style(
+      e === element ? tagName : (e + '[is="' + tagName + '"]')
+    );
   function bootstrap(element) {
     if (!initialized.has(element)) {
       initialized.set(element, 0);

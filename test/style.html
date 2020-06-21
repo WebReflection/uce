@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  if(this.customElements)
+    try{customElements.define('built-in',document.createElement('p').constructor,{'extends':'p'})}
+    catch(s){document.write('<script src="//unpkg.com/@ungap/custom-elements-builtin"><\x2fscript>')}
+  else
+    document.write('<script src="//unpkg.com/document-register-element"><\x2fscript>');
+  if (document.documentElement.attachShadow)
+    document.write('<script src="../new.js"><\x2fscript>');
+  else {
+    document.write('<script src="//unpkg.com/attachshadow"><\x2fscript>');
+    document.write('<script src="../min.js"><\x2fscript>');
+  }
+  </script>
+  <script>
+  uce.define('my-counter', {
+    extends: 'div',
+    style: function (selector) {
+      return selector + '{font-weight: bold;text-transform:uppercase}';
+    }
+  });
+  </script>
+</head>
+<body>
+  <div is="my-counter">test</div>
+</body>
+</html>

@@ -7,7 +7,7 @@ uhtml.html = function () { return ''; };
 const {define} = require('../cjs');
 
 define('el-0', {props: {}, attachShadow: {mode: 'open'}});
-define('el-1', {init() {}});
+define('el-1', {init() {}, style(selector) { return `${selector}{color:green}` }});
 define('el-2', {onClick() {}, ontest() {}, onCamelCase() {}});
 define('el-3', {onClick() {}, onClickOptions: true});
 define('el-4', {onClick() {}, handleEvent() {}});
@@ -21,7 +21,7 @@ define('el-6', {
   disconnected() {}
 });
 
-define('el-7', {extends: 'div'});
+define('el-7', {extends: 'div', style(selector) { return `${selector}{color:green}` }});
 
 const El1 = customElements.get('el-1');
 const el1 = new El1(document);
