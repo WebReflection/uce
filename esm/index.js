@@ -26,7 +26,6 @@ export const define = (tagName, definition) => {
     handleEvent,
     init,
     observedAttributes,
-    props,
     style
   } = definition;
   const initialized = new WeakMap;
@@ -63,7 +62,7 @@ export const define = (tagName, definition) => {
       this[retype[event.type]](event);
     }};
 
-  if (!props)
+  if (!('props' in proto))
     proto.props = {get() {
       const props = {};
       for (let {attributes} = this, {length} = attributes, i = 0; i < length; i++) {

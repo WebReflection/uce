@@ -959,7 +959,6 @@ var uce = (function (exports) {
         handleEvent = definition.handleEvent,
         init = definition.init,
         observedAttributes = definition.observedAttributes,
-        props = definition.props,
         style = definition.style;
     var initialized = new WeakMap();
     var statics = {};
@@ -1007,7 +1006,7 @@ var uce = (function (exports) {
         this[retype[event.type]](event);
       }
     };
-    if (!props) proto.props = {
+    if (!('props' in proto)) proto.props = {
       get: function get() {
         var props = {};
 
