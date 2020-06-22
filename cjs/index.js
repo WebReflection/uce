@@ -1,6 +1,7 @@
 'use strict';
 const {render, html, svg} = require('uhtml');
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
+const css = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('dummy-tag'));
 
 const CE = customElements;
 const {define: defineCustomElement} = CE;
@@ -15,10 +16,6 @@ const info = e => constructors.get(e) || constructors.set(e, {
   c: el(e).constructor,
   e
 });
-
-exports.render = render;
-exports.html = html;
-exports.svg = svg;
 
 const define = (tagName, definition) => {
   const {
@@ -122,7 +119,12 @@ const define = (tagName, definition) => {
     }
   }
 };
+
 exports.define = define;
+exports.render = render;
+exports.html = html;
+exports.svg = svg;
+exports.css = css;
 
 /* istanbul ignore else */
 if (!CE.get('uce-lib'))
@@ -135,6 +137,7 @@ if (!CE.get('uce-lib'))
     static get render() { return render; }
     static get html() { return html; }
     static get svg() { return svg; }
+    static get css() { return css; }
   });
 
 function content() {

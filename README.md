@@ -36,10 +36,12 @@ If the element doesn't extend a built-in, the received `selector` will simply be
 
 _<em>µ</em>ce_ exports `render`, `html`, and `svg`, from _<em>µ</em>html_, plus its own way to `define` components.
 
+In version *1.2*, it exports also a [dummy-tag](https://github.com/WebReflection/dummy-tag#readme) named `css`, useful to trigger _CSS_ minifiers.
+
 Check out the [test page](https://webreflection.github.io/uce/test/) or this [code pen playground](https://codepen.io/WebReflection/pen/MWwJpWx?editors=0010).
 
 ```js
-import {define} from 'uce';
+import {define, css} from 'uce';
 
 define('my-component', {
 
@@ -51,7 +53,12 @@ define('my-component', {
   // a <style> element in the document <head>.
   // In this case, selector will be the string:
   // div[is="my-component"]
-  style: selector => `${selector} {
+  // the no-op/dummy css tag helps with minification
+  // but it's not necessary at all if your bundler
+  // wouldn't consider it.
+  // Please note this is not a method, just a static
+  // helper that won't be attached to the class.
+  style: selector => css`${selector} {
     font-weight: bold;
   }`,
 

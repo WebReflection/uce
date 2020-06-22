@@ -1,5 +1,6 @@
 import {render, html, svg} from 'uhtml';
 import umap from 'umap';
+import css from 'dummy-tag';
 
 const CE = customElements;
 const {define: defineCustomElement} = CE;
@@ -15,9 +16,7 @@ const info = e => constructors.get(e) || constructors.set(e, {
   e
 });
 
-export {render, html, svg};
-
-export const define = (tagName, definition) => {
+const define = (tagName, definition) => {
   const {
     attachShadow,
     attributeChanged,
@@ -120,6 +119,8 @@ export const define = (tagName, definition) => {
   }
 };
 
+export {define, render, html, svg, css};
+
 /* istanbul ignore else */
 if (!CE.get('uce-lib'))
   // theoretically this could be just class { ... }
@@ -131,6 +132,7 @@ if (!CE.get('uce-lib'))
     static get render() { return render; }
     static get html() { return html; }
     static get svg() { return svg; }
+    static get css() { return css; }
   });
 
 function content() {

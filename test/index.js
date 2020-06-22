@@ -4,7 +4,9 @@ document.importNode = function (arg) {};
 
 const uhtml = require('uhtml');
 uhtml.html = function () { return ''; };
-const {define} = require('../cjs');
+const {define, css} = require('../cjs');
+
+console.assert(css`1${2}3` === '123', 'css works');
 
 define('el-0', {props: {}, attachShadow: {mode: 'open'}});
 define('el-1', {init() {}, style(selector) { return `${selector}{color:green}` }});
@@ -57,7 +59,8 @@ el7.html``;
 //*/
 
 customElements.whenDefined('uce-lib').then(
-  ({html, svg, render, define: udefine} = customElements.get('uce-lib')) => {
+  ({css, html, svg, render, define: udefine} = customElements.get('uce-lib')) => {
+    console.assert(css`1${2}3` === '123', 'css works');
     console.assert(udefine === define, 'define is OK');
     console.assert(typeof html === 'function', 'html is OK');
     console.assert(typeof svg === 'function', 'svg is OK');

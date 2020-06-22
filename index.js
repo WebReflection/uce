@@ -929,6 +929,14 @@ var uce = (function (exports) {
   var html = tag('html');
   var svg = tag('svg');
 
+  function dummyTag(t) {
+    for (var s = t[0], i = 1, l = arguments.length; i < l; i++) {
+      s += arguments[i] + t[i];
+    }
+
+    return s;
+  }
+
   var CE = customElements;
   var defineCustomElement = CE.define;
   var create$1 = Object.create,
@@ -951,6 +959,7 @@ var uce = (function (exports) {
       e: e
     });
   };
+
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
         attributeChanged = definition.attributeChanged,
@@ -1126,6 +1135,11 @@ var uce = (function (exports) {
         get: function get() {
           return svg;
         }
+      }, {
+        key: "css",
+        get: function get() {
+          return dummyTag;
+        }
       }]);
 
       return _class;
@@ -1135,6 +1149,7 @@ var uce = (function (exports) {
     return render(this, html.apply(null, arguments));
   }
 
+  exports.css = dummyTag;
   exports.define = define;
   exports.html = html;
   exports.render = render;
