@@ -71,6 +71,12 @@ define('my-component', {
     console.log(this.props.name); // "ag"
   },
 
+  // if you'd like to use props for other purposes,
+  // as in direct access via .props or something else,
+  // either define it or set it to null, so it won't
+  // get the helper during its definition
+  props: null,
+
   // if specified, it renders within its Shadow DOM
   // compatible with both open and closed modes
   attachShadow: {mode: 'closed'},
