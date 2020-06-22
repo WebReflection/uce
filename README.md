@@ -9,13 +9,18 @@
 **[µhtml](https://github.com/WebReflection/uhtml#readme)** based Custom Elements.
 
 
-### New in v1.1
+### New in v1.2
 
 So far, the only missing utility for *non* Shadow DOM cases, is a way to define *once* a generic *style* associated with a component, which is why the special `style: (selector) => css` property has been added, so that any component can automatically define any specific style, using the `selector` to confine inner nodes directives.
 
+The `css` export is a dummy template literal tag, which is completely optional, but it might help minifiers, or [rollup plugins](https://github.com/asyncLiz/rollup-plugin-minify-html-literals), to minify that code too.
+
 ```js
+// note: the css import is optional
+import {define, css} from 'uce';
+
 define('very-important', {
-  style: sel => `
+  style: sel => css`
     ${sel} {
       font-weight: bold;
       text-transform: uppercase;
@@ -27,7 +32,7 @@ define('very-important', {
 });
 ```
 
-If the element doesn't extend a built-in, the received `selector` will simply be its name, otherwise it'll be the built-in name with its `[is="..."]` attribute.
+If the element doesn't extend a built-in, the received `sel`, as _selector_, will simply be its name, otherwise it'll be the built-in name with its `[is="..."]` attribute.
 
 **Please note** the `style` won't interfere, or be attached anyhow, with the regular `element.style` or `this.style`, within a method, which is actually why I've chosen that name, so it's clear it's about the generic class/component style, and not its property.
 
@@ -53,11 +58,6 @@ define('my-component', {
   // a <style> element in the document <head>.
   // In this case, selector will be the string:
   // div[is="my-component"]
-  // the no-op/dummy css tag helps with minification
-  // but it's not necessary at all if your bundler
-  // wouldn't consider it.
-  // Please note this is not a method, just a static
-  // helper that won't be attached to the class.
   style: selector => css`${selector} {
     font-weight: bold;
   }`,
