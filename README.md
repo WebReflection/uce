@@ -146,6 +146,29 @@ customElements.whenDefined('uce-lib').then(() => {
     }
   });
 });
+
+// as shortcut
+customElements
+  .whenDefined('uce-lib')
+  .then(({define, render, html} = customElements.get('uce-lib')) => {
+    // ... define your CE here ...
+  });
+```
+
+#### Using a helper
+
+With just a minimal amount of code it's possible to simplify further the retrieval of any custom elements.
+
+```js
+// possibly shared helper
+const waitFor = what => customElements
+                        .whenDefined(what)
+                        .then(() => customElements.get(what));
+
+// components definition without uce loaded upfront
+waitFor('uce-lib').then(({define, render, html, svg}) => {
+  // define your Custom Element
+});
 ```
 
 
