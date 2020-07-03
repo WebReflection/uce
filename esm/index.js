@@ -1,6 +1,6 @@
 import {render, html, svg} from 'uhtml';
 import umap from 'umap';
-import css from 'dummy-tag';
+import css from 'plain-tag';
 
 const CE = customElements;
 const {define: defineCustomElement} = CE;

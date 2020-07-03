@@ -929,7 +929,7 @@ var uce = (function (exports) {
   var html = tag('html');
   var svg = tag('svg');
 
-  function dummyTag(t) {
+  function css (t) {
     for (var s = t[0], i = 1, l = arguments.length; i < l; i++) {
       s += arguments[i] + t[i];
     }
@@ -1138,7 +1138,7 @@ var uce = (function (exports) {
       }, {
         key: "css",
         get: function get() {
-          return dummyTag;
+          return css;
         }
       }]);
 
@@ -1149,7 +1149,7 @@ var uce = (function (exports) {
     return render(this, html.apply(null, arguments));
   }
 
-  exports.css = dummyTag;
+  exports.css = css;
   exports.define = define;
   exports.html = html;
   exports.render = render;
