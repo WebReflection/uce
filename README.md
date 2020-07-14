@@ -171,6 +171,16 @@ waitFor('uce-lib').then(({define, render, html, svg}) => {
 });
 ```
 
+But there's a module for that, which brings in basically just that boilerplate whenever it's needed, it's called [once-defined](https://github.com/WebReflection/once-defined#readme):
+
+```js
+import when from 'once-defined';
+
+when('uce').then(({define, render, html, svg}) => {
+  // define your Custom Element
+});
+```
+
 
 
 ### Without classes, how does one define private properties?
