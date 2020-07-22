@@ -9,6 +9,15 @@
 **[µhtml](https://github.com/WebReflection/uhtml#readme)** based Custom Elements.
 
 
+
+#### What happened between 1.2 and 1.5?
+
+A wrong `npm publish` happened, as `1.5.0` has been pushed for no reason between 0.5 an 0.6, so that latest was picking up actually an older version of the library.
+
+My apologies.
+
+
+
 ### New in v1.2
 
 So far, the only missing utility for *non* Shadow DOM cases, is a way to define *once* a generic *style* associated with a component, which is why the special `style: (selector) => css` property has been added, so that any component can automatically define any specific style, using the `selector` to confine inner nodes directives.
