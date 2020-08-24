@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+  if(this.customElements)
+    try{customElements.define('built-in',document.createElement('p').constructor,{'extends':'p'})}
+    catch(s){document.write('<script src="//unpkg.com/@ungap/custom-elements-builtin@latest"><\x2fscript>')}
+  else
+    document.write('<script src="//unpkg.com/document-register-element"><\x2fscript>');
+  if (document.documentElement.attachShadow)
+    document.write('<script src="../new.js"><\x2fscript>');
+  else {
+    document.write('<script src="//unpkg.com/attachshadow"><\x2fscript>');
+    document.write('<script src="../min.js"><\x2fscript>');
+  }
+  </script>
+  <script>
+  uce.define('red-span', {
+    extends: 'span',
+    style: sel => `
+      ${sel} {
+        color: red;
+      }
+    `,
+    init() {
+      this.textContent = 'OK';
+    }
+  });
+  uce.define('blue-button', {
+    extends: 'button',
+    style: sel => `
+      ${sel} {
+        color: blue;
+      }
+    `,
+    init() {
+      this.html`blue <span is="red-span">red</span>!`;
+    }
+  });
+  </script>
+</head>
+<body>
+  <button is="blue-button"></button>
+</body>
+</html>

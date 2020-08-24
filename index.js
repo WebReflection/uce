@@ -178,10 +178,8 @@ var uce = (function (exports) {
   };
   var persistent = function persistent(fragment) {
     var childNodes = fragment.childNodes;
-    var length = childNodes.length; // If the fragment has no content
-    // it should return undefined and break
-
-    if (length < 2) return childNodes[0];
+    var length = childNodes.length;
+    if (length < 2) return length ? childNodes[0] : fragment;
     var nodes = slice.call(childNodes, 0);
     var firstChild = nodes[0];
     var lastChild = nodes[length - 1];
@@ -600,7 +598,7 @@ var uce = (function (exports) {
   }; // attributes can be:
   //  * ref=${...}      for hooks and other purposes
   //  * aria=${...}     for aria attributes
-  //  * data=${...}     for dataset related attributes
+  //  * .dataset=${...} for dataset related attributes
   //  * .setter=${...}  for Custom Elements setters or nodes with setters
   //                    such as buttons, details, options, select, etc
   //  * onevent=${...}  to automatically handle event listeners
