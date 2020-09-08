@@ -143,44 +143,22 @@ This module reserves, in the Custom Elements Registry a `uce-lib` class, which o
 
 ```js
 // whenever uce library is loaded
-customElements.whenDefined('uce-lib').then(() => {
-
-  // grab all utilities from the uce-lib Class
-  const {define, render, html, svg} = customElements.get('uce-lib');
-
-  // that's it: ready to go 🎉
-  define('my-component', {
-    init() {
-      console.log('this is awesome!');
-    }
-  });
-});
-
-// as shortcut
 customElements
   .whenDefined('uce-lib')
-  .then(({define, render, html} = customElements.get('uce-lib')) => {
-    // ... define your CE here ...
-  });
+  .then(({define, render, html, svg} = customElements.get('uce-lib')) => {
+    // that's it: ready to go 🎉
+    define('my-component', {
+      init() {
+        console.log('this is awesome!');
+      }
+    });
+  }
+);
 ```
 
 #### Using a helper
 
-With just a minimal amount of code it's possible to simplify further the retrieval of any custom elements.
-
-```js
-// possibly shared helper
-const waitFor = what => customElements
-                        .whenDefined(what)
-                        .then(() => customElements.get(what));
-
-// components definition without uce loaded upfront
-waitFor('uce-lib').then(({define, render, html, svg}) => {
-  // define your Custom Element
-});
-```
-
-But there's a module for that, which brings in basically just that boilerplate whenever it's needed, it's called [once-defined](https://github.com/WebReflection/once-defined#readme):
+"_There's a module for that_", it's called [once-defined](https://github.com/WebReflection/once-defined#readme):
 
 ```js
 import when from 'once-defined';
