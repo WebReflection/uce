@@ -9,53 +9,17 @@
 **[µhtml](https://github.com/WebReflection/uhtml#readme)** based Custom Elements.
 
 
-
-#### What happened between 1.2 and 1.5?
-
-A wrong `npm publish` happened, as `1.5.0` has been pushed for no reason between 0.5 an 0.6, so that latest was picking up actually an older version of the library.
-
-My apologies.
-
-
-
-### New in v1.2
-
-So far, the only missing utility for *non* Shadow DOM cases, is a way to define *once* a generic *style* associated with a component, which is why the special `style: (selector) => css` property has been added, so that any component can automatically define any specific style, using the `selector` to confine inner nodes directives.
-
-The `css` export is a dummy template literal tag, which is completely optional, but it might help minifiers, or [rollup plugins](https://github.com/asyncLiz/rollup-plugin-minify-html-literals), to minify that code too.
-
-```js
-// note: the css import is optional
-import {define, css} from 'uce';
-
-define('very-important', {
-  style: sel => css`
-    ${sel} {
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    ${sel}:hover {
-      font-size: 2rem;
-    }
-  `
-});
-```
-
-If the element doesn't extend a built-in, the received `sel`, as _selector_, will simply be its name, otherwise it'll be the built-in name with its `[is="..."]` attribute.
-
-**Please note** the `style` won't interfere, or be attached anyhow, with the regular `element.style` or `this.style`, within a method, which is actually why I've chosen that name, so it's clear it's about the generic class/component style, and not its property.
-
-
-## API In A Nutshell
+## API Overview
 
 _<em>µ</em>ce_ exports `render`, `html`, and `svg`, from _<em>µ</em>html_, plus its own way to `define` components.
 
-In version *1.2*, it exports also a [dummy-tag](https://github.com/WebReflection/dummy-tag#readme) named `css`, useful to trigger _CSS_ minifiers.
+In version *1.2*, it exports also a [plain-tag](https://github.com/WebReflection/plain-tag#readme) named `css`, useful to trigger _CSS_ minifiers.
 
 Check out the [test page](https://webreflection.github.io/uce/test/) or this [code pen playground](https://codepen.io/WebReflection/pen/MWwJpWx?editors=0010).
 
 ```js
-import {define, css} from 'uce';
+// list of all exports
+import {define, render, html, svg, css} from 'uce';
 
 define('my-component', {
 
@@ -136,8 +100,22 @@ define('my-component', {
 });
 ```
 
+## F.A.Q.
 
-### How to avoid bundling µce per each component?
+<details>
+  <summary><strong>Which polyfill should I use?</strong></summary>
+  <div>
+
+The [@ungap/custom-elements](https://github.com/ungap/custom-elements#readme) is the recommended polyfill to grant every Custom Elements V1 feature is available in every browser.
+
+However, if no builtin extend is used, but legacy needs to be supported, including [@webreflection/custom-elements-no-builtin](https://github.com/WebReflection/custom-elements-no-builtin#readme) on top of the page should patch [IE 11 and other legacy browsers](https://github.com/ungap/custom-elements#compatibility).
+
+  </div>
+</details>
+
+<details>
+  <summary><strong>How to avoid bundling µce per each component?</strong></summary>
+  <div>
 
 This module reserves, in the Custom Elements Registry a `uce-lib` class, which only purpose is to provide all exports as static getters.
 
@@ -156,21 +134,25 @@ customElements
 );
 ```
 
-#### Using a helper
+<strong>Using a helper</strong>
 
 "_There's a module for that_", it's called [once-defined](https://github.com/WebReflection/once-defined#readme):
 
 ```js
 import when from 'once-defined';
 
-when('uce').then(({define, render, html, svg}) => {
+when('uce-lib').then(({define, render, html, svg}) => {
   // define your Custom Element
 });
 ```
 
+  </div>
+</details>
 
 
-### Without classes, how does one define private properties?
+<details>
+  <summary><strong>Without classes, how does one define private properties?</strong></summary>
+  <div>
 
 Private properties can be created via a _WeakMap_, which is indeed how _Babel_ transforms these anyway.
 
@@ -189,8 +171,12 @@ define('ce-with-privates', {
 });
 ```
 
+  </div>
+</details>
 
-### Without classes, how does one extend other components?
+<details>
+  <summary><strong>Without classes, how does one extend other components?</strong></summary>
+  <div>
 
 There are at least two ways to extend an _uce_ component:
 
@@ -225,3 +211,49 @@ define('first-component', mixin(FirstComponent, {
   otherThing() {}
 }));
 ```
+
+  </div>
+</details>
+
+<details>
+  <summary><strong>What happened between 1.2 and 1.5?</strong></summary>
+  <div>
+
+A wrong `npm publish` happened, as `1.5.0` has been pushed for no reason between 0.5 an 0.6, so that latest was picking up actually an older version of the library.
+
+My apologies.
+
+  </div>
+</details>
+
+<details>
+  <summary><strong>What's new in v1.2?</strong></summary>
+  <div>
+
+So far, the only missing utility for *non* Shadow DOM cases, is a way to define *once* a generic *style* associated with a component, which is why the special `style: (selector) => css` property has been added, so that any component can automatically define any specific style, using the `selector` to confine inner nodes directives.
+
+The `css` export is a plain template literal tag, which is completely optional, but it might help minifiers, or [rollup plugins](https://github.com/asyncLiz/rollup-plugin-minify-html-literals), to minify that code too.
+
+```js
+// note: the css import is optional
+import {define, css} from 'uce';
+
+define('very-important', {
+  style: sel => css`
+    ${sel} {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    ${sel}:hover {
+      font-size: 2rem;
+    }
+  `
+});
+```
+
+If the element doesn't extend a built-in, the received `sel`, as _selector_, will simply be its name, otherwise it'll be the built-in name with its `[is="..."]` attribute.
+
+**Please note** the `style` won't interfere, or be attached anyhow, with the regular `element.style` or `this.style`, within a method, which is actually why I've chosen that name, so it's clear it's about the generic class/component style, and not its property.
+
+  </div>
+</details>
