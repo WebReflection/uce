@@ -1030,41 +1030,45 @@ var uce = (function (exports) {
       }
     };
 
-    if (props instanceof Object) {
-      var _loop = function _loop(_k, _i) {
-        var _ = new WeakMap();
+    if (props !== null) {
+      if (props) {
+        var _loop = function _loop(_k, _i) {
+          var _ = new WeakMap();
 
-        var key = _k[_i];
-        defaultProps.set(_, props[key]);
-        proto[key] = {
+          var key = _k[_i];
+          defaultProps.set(_, props[key]);
+          proto[key] = {
+            get: function get() {
+              return _.get(this);
+            },
+            set: function set(value) {
+              _.set(this, value);
+
+              (this.render || noop).call(this);
+            }
+          };
+        };
+
+        for (var _k = keys(props), _i = 0; _i < _k.length; _i++) {
+          _loop(_k, _i);
+        }
+      } else {
+        proto.props = {
           get: function get() {
-            return _.get(this);
-          },
-          set: function set(value) {
-            _.set(this, value);
+            var props = {};
 
-            (this.render || noop).call(this);
+            for (var attributes = this.attributes, _length2 = attributes.length, _i2 = 0; _i2 < _length2; _i2++) {
+              var _attributes$_i = attributes[_i2],
+                  name = _attributes$_i.name,
+                  value = _attributes$_i.value;
+              props[name] = value;
+            }
+
+            return props;
           }
         };
-      };
-
-      for (var _k = keys(props), _i = 0; _i < _k.length; _i++) {
-        _loop(_k, _i);
       }
-    } else if (props !== null) proto.props = {
-      get: function get() {
-        var props = {};
-
-        for (var attributes = this.attributes, _length2 = attributes.length, _i2 = 0; _i2 < _length2; _i2++) {
-          var _attributes$_i = attributes[_i2],
-              name = _attributes$_i.name,
-              value = _attributes$_i.value;
-          props[name] = value;
-        }
-
-        return props;
-      }
-    };
+    }
 
     if (observedAttributes) statics.observedAttributes = {
       value: observedAttributes

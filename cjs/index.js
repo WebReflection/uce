@@ -77,29 +77,32 @@ const define = (tagName, definition) => {
       this[retype[event.type]](event);
     }};
 
-  if (props instanceof Object) {
-    for (let k = keys(props), i = 0; i < k.length; i++) {
-      const _ = new WeakMap;
-      const key = k[i];
-      defaultProps.set(_, props[key]);
-      proto[key] = {
-        get() { return _.get(this); },
-        set(value) {
-          _.set(this, value);
-          (this.render || noop).call(this);
+  if (props !== null) {
+    if (props) {
+      for (let k = keys(props), i = 0; i < k.length; i++) {
+        const _ = new WeakMap;
+        const key = k[i];
+        defaultProps.set(_, props[key]);
+        proto[key] = {
+          get() { return _.get(this); },
+          set(value) {
+            _.set(this, value);
+            (this.render || noop).call(this);
+          }
+        };
+      }
+    }
+    else {
+      proto.props = {get() {
+        const props = {};
+        for (let {attributes} = this, {length} = attributes, i = 0; i < length; i++) {
+          const {name, value} = attributes[i];
+          props[name] = value;
         }
-      };
+        return props;
+      }};
     }
   }
-  else if (props !== null)
-    proto.props = {get() {
-      const props = {};
-      for (let {attributes} = this, {length} = attributes, i = 0; i < length; i++) {
-        const {name, value} = attributes[i];
-        props[name] = value;
-      }
-      return props;
-    }};
 
   if (observedAttributes)
     statics.observedAttributes = {value: observedAttributes};
