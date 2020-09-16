@@ -5,7 +5,7 @@ const css = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istan
 
 const CE = customElements;
 const {define: defineCustomElement} = CE;
-const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
+const {create, defineProperties, getOwnPropertyDescriptor, hasOwnProperty, keys} = Object;
 
 const element = 'element';
 const constructors = umap(new Map([[element, {c: HTMLElement, e: element}]]));
@@ -17,6 +17,8 @@ const info = e => constructors.get(e) || constructors.set(e, {
   e
 });
 
+const noop = () => {};
+
 const define = (tagName, definition) => {
   const {
     attachShadow,
@@ -27,20 +29,25 @@ const define = (tagName, definition) => {
     handleEvent,
     init,
     observedAttributes,
+    props,
     style
   } = definition;
-  const prestrap = definition.hasOwnProperty('constructor') ? constructor : null;
+  const strap = hasOwnProperty.call(definition, 'constructor') ? constructor : noop;
   const initialized = new WeakMap;
+  const defaultProps = new Map;
   const statics = {};
   const proto = {};
   const listeners = [];
   const retype = create(null);
-  const bootstrap = element => {
-    if (init && !initialized.has(element)) {
-      initialized.set(element, 0);
-      init.call(element);
-    }
-  };
+  const bootstrap = init ?
+    element => {
+      if (!initialized.has(element)) {
+        initialized.set(element, 0);
+        init.call(element);
+      }
+    } :
+    noop
+  ;
   for (let k = keys(definition), i = 0, {length} = k; i < length; i++) {
     const key = k[i];
     if (/^on/.test(key) && !/Options$/.test(key)) {
@@ -70,7 +77,21 @@ const define = (tagName, definition) => {
       this[retype[event.type]](event);
     }};
 
-  if (!('props' in proto))
+  if (props instanceof Object) {
+    for (let k = keys(props), i = 0; i < k.length; i++) {
+      const _ = new WeakMap;
+      const key = k[i];
+      defaultProps.set(_, props[key]);
+      proto[key] = {
+        get() { return _.get(this); },
+        set(value) {
+          _.set(this, value);
+          (this.render || noop).call(this);
+        }
+      };
+    }
+  }
+  else if (props !== null)
     proto.props = {get() {
       const props = {};
       for (let {attributes} = this, {length} = attributes, i = 0; i < length; i++) {
@@ -110,8 +131,10 @@ const define = (tagName, definition) => {
         const {type, options} = listeners[i];
         this.addEventListener(type, this, options);
       }
-      if (prestrap)
-        prestrap.call(this);
+      defaultProps.forEach((value, _) => {
+        _.set(this, value);
+      });
+      strap.call(this);
     }
   };
   defineProperties(MicroElement, statics);

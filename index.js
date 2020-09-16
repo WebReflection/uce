@@ -943,6 +943,7 @@ var uce = (function (exports) {
   var create$1 = Object.create,
       defineProperties$1 = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
+      hasOwnProperty = Object.hasOwnProperty,
       keys = Object.keys;
   var element = 'element';
   var constructors = umap(new Map([[element, {
@@ -961,6 +962,8 @@ var uce = (function (exports) {
     });
   };
 
+  var noop = function noop() {};
+
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
         attributeChanged = definition.attributeChanged,
@@ -970,20 +973,21 @@ var uce = (function (exports) {
         handleEvent = definition.handleEvent,
         init = definition.init,
         observedAttributes = definition.observedAttributes,
+        props = definition.props,
         style = definition.style;
-    var prestrap = definition.hasOwnProperty('constructor') ? constructor : null;
+    var strap = hasOwnProperty.call(definition, 'constructor') ? constructor : noop;
     var initialized = new WeakMap();
+    var defaultProps = new Map();
     var statics = {};
     var proto = {};
     var listeners = [];
     var retype = create$1(null);
-
-    var bootstrap = function bootstrap(element) {
-      if (init && !initialized.has(element)) {
+    var bootstrap = init ? function (element) {
+      if (!initialized.has(element)) {
         initialized.set(element, 0);
         init.call(element);
       }
-    };
+    } : noop;
 
     for (var k = keys(definition), i = 0, _length = k.length; i < _length; i++) {
       var key = k[i];
@@ -1025,12 +1029,34 @@ var uce = (function (exports) {
         this[retype[event.type]](event);
       }
     };
-    if (!('props' in proto)) proto.props = {
+
+    if (props instanceof Object) {
+      var _loop = function _loop(_k, _i) {
+        var _ = new WeakMap();
+
+        var key = _k[_i];
+        defaultProps.set(_, props[key]);
+        proto[key] = {
+          get: function get() {
+            return _.get(this);
+          },
+          set: function set(value) {
+            _.set(this, value);
+
+            (this.render || noop).call(this);
+          }
+        };
+      };
+
+      for (var _k = keys(props), _i = 0; _i < _k.length; _i++) {
+        _loop(_k, _i);
+      }
+    } else if (props !== null) proto.props = {
       get: function get() {
         var props = {};
 
-        for (var attributes = this.attributes, _length2 = attributes.length, _i = 0; _i < _length2; _i++) {
-          var _attributes$_i = attributes[_i],
+        for (var attributes = this.attributes, _length2 = attributes.length, _i2 = 0; _i2 < _length2; _i2++) {
+          var _attributes$_i = attributes[_i2],
               name = _attributes$_i.name,
               value = _attributes$_i.value;
           props[name] = value;
@@ -1039,6 +1065,7 @@ var uce = (function (exports) {
         return props;
       }
     };
+
     if (observedAttributes) statics.observedAttributes = {
       value: observedAttributes
     };
@@ -1083,15 +1110,18 @@ var uce = (function (exports) {
           }
         });
 
-        for (var _i2 = 0; _i2 < length; _i2++) {
-          var _listeners$_i = listeners[_i2],
+        for (var _i3 = 0; _i3 < length; _i3++) {
+          var _listeners$_i = listeners[_i3],
               _type = _listeners$_i.type,
               _options = _listeners$_i.options;
 
           _this.addEventListener(_type, _assertThisInitialized(_this), _options);
         }
 
-        if (prestrap) prestrap.call(_assertThisInitialized(_this));
+        defaultProps.forEach(function (value, _) {
+          _.set(_assertThisInitialized(_this), value);
+        });
+        strap.call(_assertThisInitialized(_this));
         return _this;
       }
 

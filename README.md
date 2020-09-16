@@ -56,10 +56,23 @@ define('my-component', {
     console.log(this.props.name); // "ag"
   },
 
-  // if you'd like to use props for other purposes,
-  // as in direct access via .props or something else,
-  // either define it or set it to null, so it won't
-  // get the helper during its definition
+  // by default, props resolves all attributes by name
+  // const {prop} = this.props; will be an alias for
+  // this.getAttribute('prop') operation,
+  // but it can simulate what React props do,
+  // meaning that if it's defined as object,
+  // all properties will trigger automatically
+  // a render() call, if there is a render,
+  // and properties are set as accessor, so that
+  // the syntax to trigger these is .prop=${value}
+  // as opposite of the default prop=${value}
+  // which is observable, but it can hold only strings.
+  // props: {prop: value} will make this.props.value work.
+  // If you don't want any of this machinery around props
+  // you can opt out by defining it as null.
+  // Bear in mind, the way to pass props as accessors,
+  // is by prefixing the attribute via `.`, that is:
+  // this.html`<my-comp .prop=${value}/>`;
   props: null,
 
   // if specified, it renders within its Shadow DOM

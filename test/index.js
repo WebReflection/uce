@@ -12,16 +12,19 @@ define('el-0', {props: {}, attachShadow: {mode: 'open'}});
 define('el-1', {init() {}, style(selector) { return `${selector}{color:green}` }});
 define('el-2', {onClick() {}, ontest() {}, onCamelCase() {}});
 define('el-3', {onClick() {}, onClickOptions: true});
-define('el-4', {onClick() {}, handleEvent() {}});
+define('el-4', {props: null, onClick() {}, handleEvent() {}});
 define('el-5', {
+  props: {test: true},
   attachShadow: {mode: 'open'},
   observedAttributes: ['test'],
   attributeChanged() {}
 });
 define('el-6', {
+  props: {test: true},
   constructor() {},
   connected() {},
-  disconnected() {}
+  disconnected() {},
+  render() {}
 });
 
 define('el-7', {extends: 'div', style(selector) { return `${selector}{color:green}` }});
@@ -42,10 +45,16 @@ el2.handleEvent({type: 'camelCase'});
 
 const El5 = customElements.get('el-5');
 const el5 = new El5(document);
+console.assert(el5.test === true, 'defined props working as getter');
+el5.test = false;
+console.assert(el5.test === false, 'defined props working as setter');
 el5.attributeChangedCallback('test');
 
 const El6 = customElements.get('el-6');
 const el6 = new El6(document);
+console.assert(el6.test === true, 'defined props working as getter');
+el6.test = false;
+console.assert(el6.test === false, 'defined props working as setter');
 el6.connectedCallback();
 
 const El7 = customElements.get('el-7');
