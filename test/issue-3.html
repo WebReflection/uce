@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../index.js"></script>
+  <script>
+  const {css, define} = uce;
+  define('my-msg', {
+    props: {clicked: false},
+    init() { this.render(); },
+    render() {
+      this.html`
+        <p>${this.clicked ? 'Hi!!' : ''}</p>
+      `;
+    }
+  });
+  define('my-app', {
+    style: el => css`
+      ${el} button {
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 5px 10px;
+      }
+    `,
+    props: {clicked: false},
+    init() {
+      this.render();
+    },
+    onClick() {
+      this.clicked = !this.clicked;
+      this.render();
+    },
+    render() {
+      this.html`
+        <button>Click Me!</button>
+        <my-msg .clicked=${this.clicked} />
+      `;
+    }
+  });
+  </script>
+</head>
+<body>
+  <my-app></my-app>
+</body>
+</html>
