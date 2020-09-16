@@ -35,7 +35,12 @@ define('my-component', {
     font-weight: bold;
   }`,
 
-  // if specified, it's like the constructor
+  // this is invoked at construction time
+  // it's handy to setup once things unrelated
+  // with the actual DOM content or manipulation
+  constructor() {}
+
+  // if specified, it's like the constructor but
   // it's granted to be invoked *only once* on bootstrap
   // and *always* before connected/attributeChanged
   init() {

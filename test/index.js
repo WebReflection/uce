@@ -19,6 +19,7 @@ define('el-5', {
   attributeChanged() {}
 });
 define('el-6', {
+  constructor() {},
   connected() {},
   disconnected() {}
 });

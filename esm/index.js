@@ -20,6 +20,7 @@ const define = (tagName, definition) => {
   const {
     attachShadow,
     attributeChanged,
+    constructor,
     connected,
     disconnected,
     handleEvent,
@@ -27,11 +28,18 @@ const define = (tagName, definition) => {
     observedAttributes,
     style
   } = definition;
+  const prestrap = definition.hasOwnProperty('constructor') ? constructor : null;
   const initialized = new WeakMap;
   const statics = {};
   const proto = {};
   const listeners = [];
   const retype = create(null);
+  const bootstrap = element => {
+    if (init && !initialized.has(element)) {
+      initialized.set(element, 0);
+      init.call(element);
+    }
+  };
   for (let k = keys(definition), i = 0, {length} = k; i < length; i++) {
     const key = k[i];
     if (/^on/.test(key) && !/Options$/.test(key)) {
@@ -89,7 +97,22 @@ const define = (tagName, definition) => {
     proto.disconnectedCallback = {value: disconnected};
 
   const {c, e} = info(definition.extends || element);
-  class MicroElement extends c {};
+  class MicroElement extends c {
+    constructor(...args) {
+      super(...args);
+      defineProperties(this, {html: {
+        value: content.bind(
+          attachShadow ? this.attachShadow(attachShadow) : this
+        )
+      }});
+      for (let i = 0; i < length; i++) {
+        const {type, options} = listeners[i];
+        this.addEventListener(type, this, options);
+      }
+      if (prestrap)
+        prestrap.call(this);
+    }
+  };
   defineProperties(MicroElement, statics);
   defineProperties(MicroElement.prototype, proto);
   const args = [tagName, MicroElement];
@@ -101,22 +124,6 @@ const define = (tagName, definition) => {
     document.head.appendChild(el('style')).textContent = style(
       e === element ? tagName : (e + '[is="' + tagName + '"]')
     );
-  function bootstrap(element) {
-    if (!initialized.has(element)) {
-      initialized.set(element, 0);
-      defineProperties(element, {html: {
-        value: content.bind(
-          attachShadow ? element.attachShadow(attachShadow) : element
-        )
-      }});
-      for (let i = 0; i < length; i++) {
-        const {type, options} = listeners[i];
-        element.addEventListener(type, element, options);
-      }
-      if (init)
-        init.call(element);
-    }
-  }
 };
 
 export {define, render, html, svg, css};

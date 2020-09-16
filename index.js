@@ -964,17 +964,26 @@ var uce = (function (exports) {
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
         attributeChanged = definition.attributeChanged,
+        constructor = definition.constructor,
         connected = definition.connected,
         disconnected = definition.disconnected,
         handleEvent = definition.handleEvent,
         init = definition.init,
         observedAttributes = definition.observedAttributes,
         style = definition.style;
+    var prestrap = definition.hasOwnProperty('constructor') ? constructor : null;
     var initialized = new WeakMap();
     var statics = {};
     var proto = {};
     var listeners = [];
     var retype = create$1(null);
+
+    var bootstrap = function bootstrap(element) {
+      if (init && !initialized.has(element)) {
+        initialized.set(element, 0);
+        init.call(element);
+      }
+    };
 
     for (var k = keys(definition), i = 0, _length = k.length; i < _length; i++) {
       var key = k[i];
@@ -1059,9 +1068,31 @@ var uce = (function (exports) {
       var _super = _createSuper(MicroElement);
 
       function MicroElement() {
+        var _this;
+
         _classCallCheck(this, MicroElement);
 
-        return _super.apply(this, arguments);
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+
+        _this = _super.call.apply(_super, [this].concat(args));
+        defineProperties$1(_assertThisInitialized(_this), {
+          html: {
+            value: content.bind(attachShadow ? _this.attachShadow(attachShadow) : _assertThisInitialized(_this))
+          }
+        });
+
+        for (var _i2 = 0; _i2 < length; _i2++) {
+          var _listeners$_i = listeners[_i2],
+              _type = _listeners$_i.type,
+              _options = _listeners$_i.options;
+
+          _this.addEventListener(_type, _assertThisInitialized(_this), _options);
+        }
+
+        if (prestrap) prestrap.call(_assertThisInitialized(_this));
+        return _this;
       }
 
       return MicroElement;
@@ -1078,26 +1109,6 @@ var uce = (function (exports) {
       e: e
     });
     if (style) document.head.appendChild(el('style')).textContent = style(e === element ? tagName : e + '[is="' + tagName + '"]');
-
-    function bootstrap(element) {
-      if (!initialized.has(element)) {
-        initialized.set(element, 0);
-        defineProperties$1(element, {
-          html: {
-            value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
-          }
-        });
-
-        for (var _i2 = 0; _i2 < length; _i2++) {
-          var _listeners$_i = listeners[_i2],
-              _type = _listeners$_i.type,
-              _options = _listeners$_i.options;
-          element.addEventListener(_type, element, _options);
-        }
-
-        if (init) init.call(element);
-      }
-    }
   };
   /* istanbul ignore else */
 

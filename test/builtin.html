@@ -19,24 +19,20 @@
   <script>
   uce.define('red-span', {
     extends: 'span',
-    style: sel => `
-      ${sel} {
-        color: red;
-      }
-    `,
-    init() {
+    style: function (sel) {
+      return sel + '{color: red;}';
+    },
+    init: function () {
       this.textContent = 'OK';
     }
   });
   uce.define('blue-button', {
     extends: 'button',
-    style: sel => `
-      ${sel} {
-        color: blue;
-      }
-    `,
-    init() {
-      this.html`blue <span is="red-span">red</span>!`;
+    style: function (sel) {
+      return sel + '{color: blue}';
+    },
+    init: function () {
+      this.html(['blue <span is="red-span">red</span>!']);
     }
   });
   </script>
