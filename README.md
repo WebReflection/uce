@@ -67,7 +67,7 @@ define('my-component', {
   // the syntax to trigger these is .prop=${value}
   // as opposite of the default prop=${value}
   // which is observable, but it can hold only strings.
-  // props: {prop: value} will make this.props work.
+  // props: {prop: value} will make this.prop work.
   // If you don't want any of this machinery around props
   // you can opt out by defining it as null.
   // Bear in mind, the way to pass props as accessors,
