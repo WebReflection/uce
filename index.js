@@ -938,12 +938,30 @@ var uce = (function (exports) {
     return s;
   }
 
+  var _ = new WeakMap();
+
+  var add = function add(context, methods) {
+    _.set(context, methods);
+
+    return methods;
+  };
+
+  var set = function set(methods, method, bound) {
+    methods.set(method, bound);
+    return bound;
+  };
+
+  var bound = (function (context, fn) {
+    var method = typeof fn === 'function' ? fn : context[fn];
+    var methods = _.get(context) || add(context, new Map());
+    return methods.get(method) || set(methods, method, method.bind(context));
+  });
+
   var CE = customElements;
   var defineCustomElement = CE.define;
   var create$1 = Object.create,
       defineProperties$1 = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
-      hasOwnProperty = Object.hasOwnProperty,
       keys = Object.keys;
   var element = 'element';
   var constructors = umap(new Map([[element, {
@@ -967,7 +985,6 @@ var uce = (function (exports) {
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
         attributeChanged = definition.attributeChanged,
-        constructor = definition.constructor,
         connected = definition.connected,
         disconnected = definition.disconnected,
         handleEvent = definition.handleEvent,
@@ -975,19 +992,38 @@ var uce = (function (exports) {
         observedAttributes = definition.observedAttributes,
         props = definition.props,
         style = definition.style;
-    var strap = hasOwnProperty.call(definition, 'constructor') ? constructor : noop;
     var initialized = new WeakMap();
     var defaultProps = new Map();
     var statics = {};
     var proto = {};
     var listeners = [];
     var retype = create$1(null);
-    var bootstrap = init ? function (element) {
+
+    var bootstrap = function bootstrap(element) {
       if (!initialized.has(element)) {
         initialized.set(element, 0);
-        init.call(element);
+        defineProperties$1(element, {
+          bound: {
+            value: bound.bind(null, element)
+          },
+          html: {
+            value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
+          }
+        });
+
+        for (var i = 0; i < length; i++) {
+          var _listeners$i = listeners[i],
+              type = _listeners$i.type,
+              options = _listeners$i.options;
+          element.addEventListener(type, element, options);
+        }
+
+        defaultProps.forEach(function (value, _) {
+          _.set(element, value);
+        });
+        if (init) init.call(element);
       }
-    } : noop;
+    };
 
     for (var k = keys(definition), i = 0, _length = k.length; i < _length; i++) {
       var key = k[i];
@@ -1039,9 +1075,12 @@ var uce = (function (exports) {
           defaultProps.set(_, props[key]);
           proto[key] = {
             get: function get() {
+              bootstrap(this);
               return _.get(this);
             },
             set: function set(value) {
+              bootstrap(this);
+
               _.set(this, value);
 
               (this.render || noop).call(this);
@@ -1099,34 +1138,9 @@ var uce = (function (exports) {
       var _super = _createSuper(MicroElement);
 
       function MicroElement() {
-        var _this;
-
         _classCallCheck(this, MicroElement);
 
-        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
-
-        _this = _super.call.apply(_super, [this].concat(args));
-        defineProperties$1(_assertThisInitialized(_this), {
-          html: {
-            value: content.bind(attachShadow ? _this.attachShadow(attachShadow) : _assertThisInitialized(_this))
-          }
-        });
-
-        for (var _i3 = 0; _i3 < length; _i3++) {
-          var _listeners$_i = listeners[_i3],
-              _type = _listeners$_i.type,
-              _options = _listeners$_i.options;
-
-          _this.addEventListener(_type, _assertThisInitialized(_this), _options);
-        }
-
-        defaultProps.forEach(function (value, _) {
-          _.set(_assertThisInitialized(_this), value);
-        });
-        strap.call(_assertThisInitialized(_this));
-        return _this;
+        return _super.apply(this, arguments);
       }
 
       return MicroElement;

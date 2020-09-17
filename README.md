@@ -35,23 +35,18 @@ define('my-component', {
     font-weight: bold;
   }`,
 
-  // this is invoked at construction time
-  // it's handy to setup once things unrelated
-  // with the actual DOM content or manipulation
-  constructor() {}
-
   // if specified, it's like the constructor but
   // it's granted to be invoked *only once* on bootstrap
-  // and *always* before connected/attributeChanged
+  // and *always* before connected/attributeChanged/props
   init() {
     // µhtml is provided automatically via this.html
     // it will populate the shadow root, even if closed
     // or simply the node, if no attachShadow is defined
     this.html`<h1>Hello 👋 µce</h1>`;
-    // this.props resolves all attributes by name
-    // and returns their values (always as string)
-    // but it's handy to reach custom elements attributes
-    // without any real need to observe these, i.e.
+    // bound-once library is automatically set to the instance
+    // and it can be reached through this.bound('method');
+    this.children[0].addEventListener('click', this.bound('method'));
+    // a default props access example
     // <my-ce name="ag" />
     console.log(this.props.name); // "ag"
   },

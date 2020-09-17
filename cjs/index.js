@@ -2,6 +2,7 @@
 const {render, html, svg} = require('uhtml');
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 const css = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('plain-tag'));
+const bound = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('bound-once'));
 
 const CE = customElements;
 const {define: defineCustomElement} = CE;
@@ -23,7 +24,6 @@ const define = (tagName, definition) => {
   const {
     attachShadow,
     attributeChanged,
-    constructor,
     connected,
     disconnected,
     handleEvent,
@@ -32,22 +32,36 @@ const define = (tagName, definition) => {
     props,
     style
   } = definition;
-  const strap = hasOwnProperty.call(definition, 'constructor') ? constructor : noop;
   const initialized = new WeakMap;
   const defaultProps = new Map;
   const statics = {};
   const proto = {};
   const listeners = [];
   const retype = create(null);
-  const bootstrap = init ?
-    element => {
-      if (!initialized.has(element)) {
-        initialized.set(element, 0);
-        init.call(element);
+  const bootstrap = element => {
+    if (!initialized.has(element)) {
+      initialized.set(element, 0);
+      defineProperties(element, {
+        bound: {
+          value: bound.bind(null, element)
+        },
+        html: {
+          value: content.bind(
+            attachShadow ? element.attachShadow(attachShadow) : element
+          )
+        }
+      });
+      for (let i = 0; i < length; i++) {
+        const {type, options} = listeners[i];
+        element.addEventListener(type, element, options);
       }
-    } :
-    noop
-  ;
+      defaultProps.forEach((value, _) => {
+        _.set(element, value);
+      });
+      if (init)
+        init.call(element);
+    }
+  };
   for (let k = keys(definition), i = 0, {length} = k; i < length; i++) {
     const key = k[i];
     if (/^on/.test(key) && !/Options$/.test(key)) {
@@ -84,8 +98,12 @@ const define = (tagName, definition) => {
         const key = k[i];
         defaultProps.set(_, props[key]);
         proto[key] = {
-          get() { return _.get(this); },
+          get() {
+            bootstrap(this);
+            return _.get(this);
+          },
           set(value) {
+            bootstrap(this);
             _.set(this, value);
             (this.render || noop).call(this);
           }
@@ -122,24 +140,7 @@ const define = (tagName, definition) => {
     proto.disconnectedCallback = {value: disconnected};
 
   const {c, e} = info(definition.extends || element);
-  class MicroElement extends c {
-    constructor(...args) {
-      super(...args);
-      defineProperties(this, {html: {
-        value: content.bind(
-          attachShadow ? this.attachShadow(attachShadow) : this
-        )
-      }});
-      for (let i = 0; i < length; i++) {
-        const {type, options} = listeners[i];
-        this.addEventListener(type, this, options);
-      }
-      defaultProps.forEach((value, _) => {
-        _.set(this, value);
-      });
-      strap.call(this);
-    }
-  };
+  class MicroElement extends c {};
   defineProperties(MicroElement, statics);
   defineProperties(MicroElement.prototype, proto);
   const args = [tagName, MicroElement];
