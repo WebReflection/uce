@@ -1028,7 +1028,7 @@ var uce = (function (exports) {
     for (var k = keys(definition), i = 0, _length = k.length; i < _length; i++) {
       var key = k[i];
 
-      if (/^on/.test(key) && !/Options$/.test(key)) {
+      if (/^on./.test(key) && !/Options$/.test(key)) {
         var options = definition[key + 'Options'] || false;
         var lower = key.toLowerCase();
         var type = lower.slice(2);

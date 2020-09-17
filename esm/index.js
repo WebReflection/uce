@@ -63,7 +63,7 @@ const define = (tagName, definition) => {
   };
   for (let k = keys(definition), i = 0, {length} = k; i < length; i++) {
     const key = k[i];
-    if (/^on/.test(key) && !/Options$/.test(key)) {
+    if (/^on./.test(key) && !/Options$/.test(key)) {
       const options = definition[key + 'Options'] || false;
       const lower = key.toLowerCase();
       let type = lower.slice(2);
