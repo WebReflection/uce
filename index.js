@@ -980,8 +980,6 @@ var uce = (function (exports) {
     });
   };
 
-  var noop = function noop() {};
-
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
         attributeChanged = definition.attributeChanged,
@@ -991,6 +989,7 @@ var uce = (function (exports) {
         init = definition.init,
         observedAttributes = definition.observedAttributes,
         props = definition.props,
+        render = definition.render,
         style = definition.style;
     var initialized = new WeakMap();
     var defaultProps = new Map();
@@ -1021,7 +1020,7 @@ var uce = (function (exports) {
         defaultProps.forEach(function (value, _) {
           _.set(element, value);
         });
-        if (init) init.call(element);
+        if (init || render) (init || render).call(element);
       }
     };
 
@@ -1083,7 +1082,7 @@ var uce = (function (exports) {
 
               _.set(this, value);
 
-              (this.render || noop).call(this);
+              if (render) render.call(this);
             }
           };
         };

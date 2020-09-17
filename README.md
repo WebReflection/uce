@@ -51,6 +51,15 @@ define('my-component', {
     console.log(this.props.name); // "ag"
   },
 
+  // if there is a render method, and no `init`,
+  // this method will be invoked automatically on bootstrap.
+  // element.render(), if present, is also invoked automatically
+  // when `props` are defined as accessors, and one of these is
+  // set during some outer component render()
+  render() {
+    this.html`<h1>Hello again!</h1>`;
+  },
+
   // by default, props resolves all attributes by name
   // const {prop} = this.props; will be an alias for
   // this.getAttribute('prop') operation,

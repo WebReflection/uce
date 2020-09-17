@@ -17,8 +17,6 @@ const info = e => constructors.get(e) || constructors.set(e, {
   e
 });
 
-const noop = () => {};
-
 const define = (tagName, definition) => {
   const {
     attachShadow,
@@ -29,6 +27,7 @@ const define = (tagName, definition) => {
     init,
     observedAttributes,
     props,
+    render,
     style
   } = definition;
   const initialized = new WeakMap;
@@ -57,8 +56,8 @@ const define = (tagName, definition) => {
       defaultProps.forEach((value, _) => {
         _.set(element, value);
       });
-      if (init)
-        init.call(element);
+      if (init || render)
+        (init || render).call(element);
     }
   };
   for (let k = keys(definition), i = 0, {length} = k; i < length; i++) {
@@ -104,7 +103,8 @@ const define = (tagName, definition) => {
           set(value) {
             bootstrap(this);
             _.set(this, value);
-            (this.render || noop).call(this);
+            if (render)
+              render.call(this);
           }
         };
       }
