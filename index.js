@@ -938,25 +938,6 @@ var uce = (function (exports) {
     return s;
   }
 
-  var _ = new WeakMap();
-
-  var add = function add(context, methods) {
-    _.set(context, methods);
-
-    return methods;
-  };
-
-  var set = function set(methods, method, bound) {
-    methods.set(method, bound);
-    return bound;
-  };
-
-  var bound = (function (context, fn) {
-    var method = typeof fn === 'function' ? fn : context[fn];
-    var methods = _.get(context) || add(context, new Map());
-    return methods.get(method) || set(methods, method, method.bind(context));
-  });
-
   var CE = customElements;
   var defineCustomElement = CE.define;
   var create$1 = Object.create,
@@ -983,6 +964,7 @@ var uce = (function (exports) {
   var define = function define(tagName, definition) {
     var attachShadow = definition.attachShadow,
         attributeChanged = definition.attributeChanged,
+        bound = definition.bound,
         connected = definition.connected,
         disconnected = definition.disconnected,
         handleEvent = definition.handleEvent,
@@ -1002,9 +984,6 @@ var uce = (function (exports) {
       if (!initialized.has(element)) {
         initialized.set(element, 0);
         defineProperties$1(element, {
-          bound: {
-            value: bound.bind(null, element)
-          },
           html: {
             value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
           }
@@ -1020,6 +999,7 @@ var uce = (function (exports) {
         defaultProps.forEach(function (value, _) {
           _.set(element, value);
         });
+        if (bound) bound.forEach(bind, element);
         if (init || render) (init || render).call(element);
       }
     };
@@ -1203,6 +1183,10 @@ var uce = (function (exports) {
 
       return _class;
     }(info(element).c));
+
+  function bind(method) {
+    this[method] = this[method].bind(this);
+  }
 
   function content() {
     return render(this, html.apply(null, arguments));

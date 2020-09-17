@@ -21,6 +21,7 @@ define('el-5', {
 });
 define('el-6', {
   props: {test: true},
+  bound: ['render'],
   constructor() {},
   connected() {},
   disconnected() {},

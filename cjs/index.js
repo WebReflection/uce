@@ -2,11 +2,10 @@
 const {render, html, svg} = require('uhtml');
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 const css = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('plain-tag'));
-const bound = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('bound-once'));
 
 const CE = customElements;
 const {define: defineCustomElement} = CE;
-const {create, defineProperties, getOwnPropertyDescriptor, hasOwnProperty, keys} = Object;
+const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
 
 const element = 'element';
 const constructors = umap(new Map([[element, {c: HTMLElement, e: element}]]));
@@ -22,6 +21,7 @@ const define = (tagName, definition) => {
   const {
     attachShadow,
     attributeChanged,
+    bound,
     connected,
     disconnected,
     handleEvent,
@@ -41,9 +41,6 @@ const define = (tagName, definition) => {
     if (!initialized.has(element)) {
       initialized.set(element, 0);
       defineProperties(element, {
-        bound: {
-          value: bound.bind(null, element)
-        },
         html: {
           value: content.bind(
             attachShadow ? element.attachShadow(attachShadow) : element
@@ -57,6 +54,8 @@ const define = (tagName, definition) => {
       defaultProps.forEach((value, _) => {
         _.set(element, value);
       });
+      if (bound)
+        bound.forEach(bind, element);
       if (init || render)
         (init || render).call(element);
     }
@@ -173,6 +172,10 @@ if (!CE.get('uce-lib'))
     static get svg() { return svg; }
     static get css() { return css; }
   });
+
+function bind(method) {
+  this[method] = this[method].bind(this);
+}
 
 function content() {
   return render(this, html.apply(null, arguments));

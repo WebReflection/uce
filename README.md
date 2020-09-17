@@ -43,9 +43,6 @@ define('my-component', {
     // it will populate the shadow root, even if closed
     // or simply the node, if no attachShadow is defined
     this.html`<h1>Hello 👋 µce</h1>`;
-    // bound-once library is automatically set to the instance
-    // and it can be reached through this.bound('method');
-    this.children[0].addEventListener('click', this.bound('method'));
     // a default props access example
     // <my-ce name="ag" />
     console.log(this.props.name); // "ag"
@@ -78,6 +75,11 @@ define('my-component', {
   // is by prefixing the attribute via `.`, that is:
   // this.html`<my-comp .prop=${value}/>`;
   props: null,
+
+  // if present, all names will be automatically bound to the element
+  // right before initialization (el.method = el.method.bind(el))
+  // this allows usage of methods instead of `this` for inner components
+  bound: ['method'],
 
   // if specified, it renders within its Shadow DOM
   // compatible with both open and closed modes

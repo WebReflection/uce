@@ -7,14 +7,15 @@
   <script>
   uce.define('my-counter', {
     count: 0,
+    bound: ['inc', 'dec'],
     init() { this.render(); },
     inc() { this.count++; this.render(); },
     dec() { this.count--; this.render(); },
     render() {
       this.html`
-        <button onclick=${this.bound('dec')}>-</button>
+        <button onclick=${this.dec}>-</button>
         <span>${this.count}</span>
-        <button onclick=${this.bound('inc')}>+</button>
+        <button onclick=${this.inc}>+</button>
       `;
     }
   });
