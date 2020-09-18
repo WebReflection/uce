@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../min.js"></script>
+  <script>
+  uce.define('my-counter', {
+    props: {count: 0},
+    bound: ['inc', 'dec'],
+    inc() { this.count++; },
+    dec() { this.count--; },
+    render() {
+      this.html`
+        <button onclick=${this.dec}>-</button>
+        <span>${this.count}</span>
+        <button onclick=${this.inc}>+</button>
+      `;
+    }
+  });
+  </script>
+</head>
+<body>
+  <my-counter></my-counter>
+</body>
+</html>
