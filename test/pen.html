@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../min.js"></script>
+  <script type="module">
+    const {define, render, html} = uce;
+
+    const {defineProperties, keys} = Object;
+
+    const accessor = (update, props, key, value) => {
+      props[key] = {
+        get: () => value,
+        set: _ => { value = _; update(); }
+      };
+    };
+    const reactive = (update, defaults) => {
+      const props = {};
+      for (let ke = keys(defaults), y = 0; y < ke.length; y++)
+        accessor(update, props, ke[y], defaults[ke[y]]);
+      return defineProperties({}, props);
+    };
+
+    define('my-component', {
+      bound: ['render'],
+      init() {
+        this.state = reactive(this.render, {
+          text: 'text',
+          show: true
+        });
+        this.render();
+      },
+      render() {
+        const {state} = this;
+        const toggle = () => {
+          state.show = !state.show;
+        };
+        const oninput = e => {
+          state.text = e.target.value;
+        };
+        this.html`
+          <button onclick=${toggle}>toggle child</button>
+          <p>
+          ${state.text} <input value=${state.text} oninput=${oninput}>
+          </p>
+          ${state.show
+            ? html`<my-child .msg=${state.text}></my-child>`
+            : ``}
+        `;
+      }
+    });
+
+    define('my-child', {
+      bound: ['render'],
+      props: {msg: ''},
+      init() {
+        console.log(this.msg, Object.getOwnPropertyDescriptor(this, 'msg'));
+        this.state = reactive(this.render, { count: 0 });
+        this.render();
+      },
+      render() {
+        const {state} = this;
+        const increase = () => {
+          state.count++;
+        };
+        this.html`
+          <p>${this.msg}</p>
+          <p>${state.count}</p>
+          <button onclick=${increase}>increase</button>
+        `;
+        console.log('child updated');
+      },
+      connected() {
+        console.log('child mounted');
+      },
+      disconnected() {
+        console.log('child unmounted');
+      }
+    });
+    </script>
+</head>
+<body>
+  <my-component></my-component>
+</body>
+</html>

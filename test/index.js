@@ -63,6 +63,9 @@ const el7 = new El7(document);
 el7.connectedCallback();
 el7.html``;
 
+el7.innerHTML = `<el-6 test=false></el-6>`;
+console.assert(el7.firstChild.test === 'false', 'attribute over default prop');
+
 /* https://github.com/whatwg/html/issues/5552
 ((c,w,m)=>{
   m=c[w];c[w]=n=>m.call(c,n).then(()=>c.get(n));

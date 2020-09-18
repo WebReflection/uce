@@ -996,7 +996,19 @@ var uce = (function (exports) {
           element.addEventListener(type, element, options);
         }
 
-        defaultProps.forEach(function (value, _) {
+        defaultProps.forEach(function (key, _) {
+          var value = props[key]; // covered via test/pen.html, hard to test in NodeJS
+
+          /* istanbul ignore if */
+
+          if (element.hasOwnProperty(key)) {
+            value = element[key];
+            delete element[key];
+          } else if (element.hasAttribute(key)) {
+            value = element.getAttribute(key);
+            element.removeAttribute(key);
+          }
+
           _.set(element, value);
         });
         if (bound) bound.forEach(bind, element);
@@ -1051,7 +1063,7 @@ var uce = (function (exports) {
           var _ = new WeakMap();
 
           var key = _k[_i];
-          defaultProps.set(_, props[key]);
+          defaultProps.set(_, key);
           proto[key] = {
             get: function get() {
               bootstrap(this);

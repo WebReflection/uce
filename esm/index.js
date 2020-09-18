@@ -50,7 +50,18 @@ const define = (tagName, definition) => {
         const {type, options} = listeners[i];
         element.addEventListener(type, element, options);
       }
-      defaultProps.forEach((value, _) => {
+      defaultProps.forEach((key, _) => {
+        let value = props[key];
+        // covered via test/pen.html, hard to test in NodeJS
+        /* istanbul ignore if */
+        if (element.hasOwnProperty(key)) {
+          value = element[key];
+          delete element[key];
+        }
+        else if (element.hasAttribute(key)) {
+          value = element.getAttribute(key);
+          element.removeAttribute(key);
+        }
         _.set(element, value);
       });
       if (bound)
@@ -93,7 +104,7 @@ const define = (tagName, definition) => {
       for (let k = keys(props), i = 0; i < k.length; i++) {
         const _ = new WeakMap;
         const key = k[i];
-        defaultProps.set(_, props[key]);
+        defaultProps.set(_, key);
         proto[key] = {
           get() {
             bootstrap(this);
