@@ -55,7 +55,6 @@
       bound: ['render'],
       props: {msg: ''},
       init() {
-        console.log(this.msg, Object.getOwnPropertyDescriptor(this, 'msg'));
         this.state = reactive(this.render, { count: 0 });
         this.render();
       },
