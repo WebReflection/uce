@@ -3,6 +3,9 @@ const {render, html, svg} = require('uhtml');
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 const css = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('plain-tag'));
 
+const domHandler = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('reactive-props/dom'));
+const reactive = domHandler({dom: true});
+
 const CE = customElements;
 const {define: defineCustomElement} = CE;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
@@ -32,12 +35,11 @@ const define = (tagName, definition) => {
     style
   } = definition;
   const initialized = new WeakMap;
-  const defaultProps = new Map;
   const statics = {};
   const proto = {};
   const listeners = [];
   const retype = create(null);
-  const bootstrap = element => {
+  const bootstrap = (element, key, value) => {
     if (!initialized.has(element)) {
       initialized.set(element, 0);
       defineProperties(element, {
@@ -51,24 +53,14 @@ const define = (tagName, definition) => {
         const {type, options} = listeners[i];
         element.addEventListener(type, element, options);
       }
-      defaultProps.forEach((key, _) => {
-        let value = props[key];
-        // covered via test/pen.html, hard to test in NodeJS
-        /* istanbul ignore if */
-        if (element.hasOwnProperty(key)) {
-          value = element[key];
-          delete element[key];
-        }
-        else if (element.hasAttribute(key)) {
-          value = element.getAttribute(key);
-          element.removeAttribute(key);
-        }
-        _.set(element, value);
-      });
       if (bound)
         bound.forEach(bind, element);
+      if (props)
+        reactive(element, props, render);
       if (init || render)
         (init || render).call(element);
+      if (key)
+        element[key] = value;
     }
   };
   for (let k = keys(definition), i = 0, {length} = k; i < length; i++) {
@@ -103,19 +95,14 @@ const define = (tagName, definition) => {
   if (props !== null) {
     if (props) {
       for (let k = keys(props), i = 0; i < k.length; i++) {
-        const _ = new WeakMap;
         const key = k[i];
-        defaultProps.set(_, key);
         proto[key] = {
           get() {
             bootstrap(this);
-            return _.get(this);
+            return props[key];
           },
           set(value) {
-            bootstrap(this);
-            _.set(this, value);
-            if (render)
-              render.call(this);
+            bootstrap(this, key, value);
           }
         };
       }

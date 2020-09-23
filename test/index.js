@@ -51,6 +51,10 @@ el5.test = false;
 console.assert(el5.test === false, 'defined props working as setter');
 el5.attributeChangedCallback('test');
 
+const el5b = new El5(document);
+el5b.test = false;
+console.assert(el5.test === false, 'defined props working as setter');
+
 const El6 = customElements.get('el-6');
 const el6 = new El6(document);
 console.assert(el6.test === true, 'defined props working as getter');

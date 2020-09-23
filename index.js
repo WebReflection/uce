@@ -938,12 +938,79 @@ var uce = (function (exports) {
     return s;
   }
 
+  var defineProperties$1 = Object.defineProperties,
+      keys = Object.keys;
+
+  var accessor = function accessor(all, shallow, hook, value, update) {
+    return {
+      configurable: true,
+      get: function get() {
+        return value;
+      },
+      set: function set(_) {
+        if (all || _ !== value || shallow && typeof(_) === 'object' && _) {
+          value = _;
+          if (hook) update.call(this, value);else update.call(this);
+        }
+      }
+    };
+  };
+
+  var loop = function loop(props, get, all, shallow, useState, update) {
+    var desc = {};
+    var hook = useState !== noop;
+    var args = [all, shallow, hook];
+
+    for (var ke = keys(props), y = 0; y < ke.length; y++) {
+      var value = get(props, ke[y]);
+      var extras = hook ? useState(value) : [value, useState];
+      if (update) extras[1] = update;
+      desc[ke[y]] = accessor.apply(null, args.concat(extras));
+    }
+
+    return desc;
+  };
+  var noop = function noop() {};
+
+  var domHandler = (function () {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref$all = _ref.all,
+        all = _ref$all === void 0 ? false : _ref$all,
+        _ref$shallow = _ref.shallow,
+        shallow = _ref$shallow === void 0 ? true : _ref$shallow,
+        _ref$useState = _ref.useState,
+        useState = _ref$useState === void 0 ? noop : _ref$useState,
+        _ref$getAttribute = _ref.getAttribute,
+        getAttribute = _ref$getAttribute === void 0 ? function (element, key) {
+      return element.getAttribute(key);
+    } : _ref$getAttribute;
+
+    return function (element, props, update) {
+      var value = function value(props, key) {
+        var result = props[key];
+
+        if (element.hasOwnProperty(key)) {
+          result = element[key];
+          delete element[key];
+        } else if (element.hasAttribute(key)) result = getAttribute(element, key);
+
+        return result;
+      };
+
+      var desc = loop(props, value, all, shallow, useState, update);
+      return defineProperties$1(element, desc);
+    };
+  });
+
+  var reactive = domHandler({
+    dom: true
+  });
   var CE = customElements;
   var defineCustomElement = CE.define;
   var create$1 = Object.create,
-      defineProperties$1 = Object.defineProperties,
+      defineProperties$2 = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
-      keys = Object.keys;
+      keys$1 = Object.keys;
   var element = 'element';
   var constructors = umap(new Map([[element, {
     c: HTMLElement,
@@ -974,16 +1041,15 @@ var uce = (function (exports) {
         render = definition.render,
         style = definition.style;
     var initialized = new WeakMap();
-    var defaultProps = new Map();
     var statics = {};
     var proto = {};
     var listeners = [];
     var retype = create$1(null);
 
-    var bootstrap = function bootstrap(element) {
+    var bootstrap = function bootstrap(element, key, value) {
       if (!initialized.has(element)) {
         initialized.set(element, 0);
-        defineProperties$1(element, {
+        defineProperties$2(element, {
           html: {
             value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
           }
@@ -996,27 +1062,14 @@ var uce = (function (exports) {
           element.addEventListener(type, element, options);
         }
 
-        defaultProps.forEach(function (key, _) {
-          var value = props[key]; // covered via test/pen.html, hard to test in NodeJS
-
-          /* istanbul ignore if */
-
-          if (element.hasOwnProperty(key)) {
-            value = element[key];
-            delete element[key];
-          } else if (element.hasAttribute(key)) {
-            value = element.getAttribute(key);
-            element.removeAttribute(key);
-          }
-
-          _.set(element, value);
-        });
         if (bound) bound.forEach(bind, element);
+        if (props) reactive(element, props, render);
         if (init || render) (init || render).call(element);
+        if (key) element[key] = value;
       }
     };
 
-    for (var k = keys(definition), i = 0, _length = k.length; i < _length; i++) {
+    for (var k = keys$1(definition), i = 0, _length = k.length; i < _length; i++) {
       var key = k[i];
 
       if (/^on./.test(key) && !/Options$/.test(key)) {
@@ -1060,26 +1113,19 @@ var uce = (function (exports) {
     if (props !== null) {
       if (props) {
         var _loop = function _loop(_k, _i) {
-          var _ = new WeakMap();
-
           var key = _k[_i];
-          defaultProps.set(_, key);
           proto[key] = {
             get: function get() {
               bootstrap(this);
-              return _.get(this);
+              return props[key];
             },
             set: function set(value) {
-              bootstrap(this);
-
-              _.set(this, value);
-
-              if (render) render.call(this);
+              bootstrap(this, key, value);
             }
           };
         };
 
-        for (var _k = keys(props), _i = 0; _i < _k.length; _i++) {
+        for (var _k = keys$1(props), _i = 0; _i < _k.length; _i++) {
           _loop(_k, _i);
         }
       } else {
@@ -1136,8 +1182,8 @@ var uce = (function (exports) {
 
       return MicroElement;
     }(c);
-    defineProperties$1(MicroElement, statics);
-    defineProperties$1(MicroElement.prototype, proto);
+    defineProperties$2(MicroElement, statics);
+    defineProperties$2(MicroElement.prototype, proto);
     var args = [tagName, MicroElement];
     if (e !== element) args.push({
       "extends": e
