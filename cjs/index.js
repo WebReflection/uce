@@ -149,6 +149,7 @@ const define = (tagName, definition) => {
     document.head.appendChild(el('style')).textContent = style(
       e === element ? tagName : (e + '[is="' + tagName + '"]')
     );
+  return MicroElement;
 };
 
 exports.define = define;

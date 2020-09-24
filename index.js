@@ -1194,6 +1194,7 @@ var uce = (function (exports) {
       e: e
     });
     if (style) document.head.appendChild(el('style')).textContent = style(e === element ? tagName : e + '[is="' + tagName + '"]');
+    return MicroElement;
   };
   /* istanbul ignore else */
 
