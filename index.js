@@ -987,12 +987,16 @@ var uce = (function (exports) {
 
     return function (element, props, update) {
       var value = function value(props, key) {
-        var result = props[key];
+        var result = props[key],
+            type = typeof(result);
 
         if (element.hasOwnProperty(key)) {
           result = element[key];
           delete element[key];
-        } else if (element.hasAttribute(key)) result = getAttribute(element, key);
+        } else if (element.hasAttribute(key)) {
+          result = getAttribute(element, key);
+          if (type == 'number') result = +result;else if (type == 'boolean') result = !/^(?:false|0|)$/.test(result);
+        }
 
         return result;
       };
