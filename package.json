@@ -13,6 +13,9 @@
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "test": "nyc node test/index.js"
   },
+  "files": [
+    "index.d.ts"
+  ],
   "keywords": [
     "uhtml",
     "Custom",
