@@ -2,7 +2,7 @@ type HTML = import('uhtml').Tag<HTMLElement>;
 type SVG = import('uhtml').Tag<SVGElement>;
 type CSS = (strings: TemplateStringsArray, ...values: unknown[]) => string;
 type Render<T, U> = (
-  this: T & U & { html: HTML; render: Render<T, U> } & HTMLElement,
+  this: {props: T} & U & { html: HTML; render: Render<T, U> } & HTMLElement,
 ) => unknown;
 
 export const css: CSS;
