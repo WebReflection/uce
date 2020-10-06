@@ -91,6 +91,8 @@ const define = (tagName, definition) => {
       this[retype[event.type]](event);
     }};
 
+  // [props]
+  // this is useless code in uce-template
   if (props !== null) {
     if (props) {
       for (let k = keys(props), i = 0; i < k.length; i++) {
@@ -117,6 +119,7 @@ const define = (tagName, definition) => {
       }};
     }
   }
+  // [/props]
 
   if (observedAttributes)
     statics.observedAttributes = {value: observedAttributes};
@@ -129,7 +132,7 @@ const define = (tagName, definition) => {
   proto.connectedCallback = {value() {
     bootstrap(this);
     if (connected)
-      connected.apply(this, arguments);
+      connected.call(this);
   }};
 
   if (disconnected)

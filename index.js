@@ -1112,7 +1112,8 @@ var uce = (function (exports) {
       value: function value(event) {
         this[retype[event.type]](event);
       }
-    };
+    }; // [props]
+    // this is useless code in uce-template
 
     if (props !== null) {
       if (props) {
@@ -1148,7 +1149,8 @@ var uce = (function (exports) {
           }
         };
       }
-    }
+    } // [/props]
+
 
     if (observedAttributes) statics.observedAttributes = {
       value: observedAttributes
@@ -1162,7 +1164,7 @@ var uce = (function (exports) {
     proto.connectedCallback = {
       value: function value() {
         bootstrap(this);
-        if (connected) connected.apply(this, arguments);
+        if (connected) connected.call(this);
       }
     };
     if (disconnected) proto.disconnectedCallback = {
