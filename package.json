@@ -41,7 +41,7 @@
   "unpkg": "min.js",
   "dependencies": {
     "plain-tag": "^0.1.3",
-    "reactive-props": "^0.2.0",
+    "reactive-props": "^0.2.1",
     "uhtml": "^2.1.2",
     "umap": "^1.0.2"
   },
