@@ -65,7 +65,7 @@ export interface Definition<T = void, U = void> {
    * and *always* before connected/attributeChanged/props
    */
   init?: (
-    this: { props: T } & U & { html: HTML; render: Render<T, U> } & HTMLElement,
+    this: { props: T } & U & HTMLElement & { html: HTML; render: Render<T, U> },
   ) => unknown;
 
   /**
