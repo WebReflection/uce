@@ -240,6 +240,17 @@ define('first-component', mixin(FirstComponent, {
 </details>
 
 <details>
+  <summary><strong>How different is <em>µce</em> from others?</strong></summary>
+  <div>
+
+I have written a gist that compares [uce vs lit-element](https://gist.github.com/WebReflection/ae3451c17c5e882bbc7f0714c14eefcd), so that most obvious differences are highlighted, but basically *uce* provides pretty much everything other libraries provide and vice-versa, and choosing one or another should be driven by personal taste and style, as long as most relevant differences are clear.
+
+That is: *uce* is neither superior nor inferior to others, it tries to be as simple and concise as possible, and it has great pontentials when used via [uce-template](https://github.com/WebReflection/uce-template#readme) too.
+
+  </div>
+</details>
+
+<details>
   <summary><strong>What happened between 1.2 and 1.5?</strong></summary>
   <div>
 
