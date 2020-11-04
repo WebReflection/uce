@@ -25,7 +25,7 @@
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
     "@ungap/degap": "^0.2.1",
-    "ascjs": "^4.0.1",
+    "ascjs": "^4.0.3",
     "basichtml": "^2.3.0",
     "coveralls": "^3.1.0",
     "drop-babel-typeof": "^1.0.3",
