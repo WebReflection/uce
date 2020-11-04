@@ -1263,6 +1263,8 @@ var uce = (function (exports) {
   exports.render = render;
   exports.svg = svg;
 
+  Object.defineProperty(exports, '__esModule', { value: true });
+
   return exports;
 
 }({}));
