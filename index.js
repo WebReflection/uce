@@ -1055,6 +1055,7 @@ var uce = (function (exports) {
         initialized.set(element, 0);
         defineProperties$2(element, {
           html: {
+            configurable: true,
             value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
           }
         });
@@ -1113,7 +1114,6 @@ var uce = (function (exports) {
         this[retype[event.type]](event);
       }
     }; // [props]
-    // this is useless code in uce-template
 
     if (props !== null) {
       if (props) {

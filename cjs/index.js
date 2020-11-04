@@ -44,6 +44,7 @@ const define = (tagName, definition) => {
       initialized.set(element, 0);
       defineProperties(element, {
         html: {
+          configurable: true,
           value: content.bind(
             attachShadow ? element.attachShadow(attachShadow) : element
           )
@@ -93,7 +94,6 @@ const define = (tagName, definition) => {
     }};
 
   // [props]
-  // this is useless code in uce-template
   if (props !== null) {
     if (props) {
       for (let k = keys(props), i = 0; i < k.length; i++) {
