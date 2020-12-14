@@ -9,6 +9,13 @@
 **[µhtml](https://github.com/WebReflection/uhtml#readme)** based Custom Elements.
 
 
+### 📣 Community Announcement
+
+Please ask questions in the [dedicated forum](https://webreflection.boards.net/) to help the community around this project grow ♥
+
+---
+
+
 ## API Overview
 
 _<em>µ</em>ce_ exports `render`, `html`, and `svg`, from _<em>µ</em>html_, plus its own way to `define` components.
