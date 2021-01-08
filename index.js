@@ -502,19 +502,19 @@ var uce = (function (exports) {
       createTreeWalker = _document.createTreeWalker,
       importNode = _document.importNode;
 
-  var IE = importNode.length != 1; // IE11 and old Edge discard empty nodes when cloning, potentially
+  var isImportNodeLengthWrong = importNode.length != 1; // IE11 and old Edge discard empty nodes when cloning, potentially
   // resulting in broken paths to find updates. The workaround here
   // is to import once, upfront, the fragment that will be cloned
   // later on, so that paths are retrieved from one already parsed,
   // hence without missing child nodes once re-cloned.
 
-  var createFragment = IE ? function (text, type) {
+  var createFragment = isImportNodeLengthWrong ? function (text, type) {
     return importNode.call(document, createContent(text, type), true);
   } : createContent; // IE11 and old Edge have a different createTreeWalker signature that
   // has been deprecated in other browsers. This export is needed only
   // to guarantee the TreeWalker doesn't show warnings and, ultimately, works
 
-  var createWalker = IE ? function (fragment) {
+  var createWalker = isImportNodeLengthWrong ? function (fragment) {
     return createTreeWalker.call(document, fragment, 1 | 128, null, false);
   } : function (fragment) {
     return createTreeWalker.call(document, fragment, 1 | 128);
@@ -646,7 +646,9 @@ var uce = (function (exports) {
   // content, within the exact same amount of updates each time.
   // This cache relates each template to its unique content and updates.
 
-  var cache = umap(new WeakMap());
+  var cache = umap(new WeakMap()); // a RegExp that helps checking nodes that cannot contain comments
+
+  var textOnly = /^(?:plaintext|script|style|textarea|title|xmp)$/i;
   var createCache = function createCache() {
     return {
       stack: [],
@@ -729,11 +731,12 @@ var uce = (function (exports) {
           });
           node.removeAttribute(search);
           search = "".concat(prefix).concat(++i);
-        } // if the node was a style or a textarea one, check its content
+        } // if the node was a style, textarea, or others, check its content
         // and if it is <!--isµX--> then update tex-only this node
 
 
-        if (/^(?:style|textarea)$/i.test(node.tagName) && node.textContent.trim() === "<!--".concat(search, "-->")) {
+        if (textOnly.test(node.tagName) && node.textContent.trim() === "<!--".concat(search, "-->")) {
+          node.textContent = '';
           nodes.push({
             type: 'text',
             path: createPath(node)
@@ -1262,8 +1265,6 @@ var uce = (function (exports) {
   exports.html = html;
   exports.render = render;
   exports.svg = svg;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
 
   return exports;
 

@@ -7,12 +7,13 @@ export default {
     includePaths({
       include: {},
     }),
-    resolve({module: true}),
+    resolve(),
     babel({presets: ['@babel/preset-env']})
   ],
   context: 'null',
   moduleContext: 'null',
   output: {
+    esModule: false,
     exports: 'named',
     file: './index.js',
     format: 'iife',

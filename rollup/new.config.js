@@ -9,12 +9,13 @@ export default {
         '@ungap/create-content': 'node_modules/@ungap/degap/create-content.js'
       },
     }),
-    resolve({module: true}),
+    resolve(),
     terser()
   ],
   context: 'null',
   moduleContext: 'null',
   output: {
+    esModule: false,
     exports: 'named',
     file: './new.js',
     format: 'iife',
