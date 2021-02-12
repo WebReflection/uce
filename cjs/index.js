@@ -1,9 +1,9 @@
 'use strict';
 const {render, html, svg} = require('uhtml');
-const umap = (m => m.__esModule ? /* c8 ignore next */ m.default : /* c8 ignore next */ m)(require('umap'));
-const css = (m => m.__esModule ? /* c8 ignore next */ m.default : /* c8 ignore next */ m)(require('plain-tag'));
+const umap = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('umap'));
+const css = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('plain-tag'));
 
-const domHandler = (m => m.__esModule ? /* c8 ignore next */ m.default : /* c8 ignore next */ m)(require('reactive-props/dom'));
+const domHandler = (m => /* c8 ignore start */ m.__esModule ? m.default : m /* c8 ignore stop */)(require('reactive-props/dom'));
 const reactive = domHandler({dom: true});
 
 const CE = customElements;

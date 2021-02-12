@@ -2,6 +2,7 @@
 node_modules/
 rollup/
 test/
+coverage/
 uce-head.jpg
 package-lock.json
 .travis.yml
