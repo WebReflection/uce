@@ -79,6 +79,7 @@ const define = (tagName, definition) => {
     }
     switch (key) {
       case 'attachShadow':
+      case 'constructor':
       case 'observedAttributes':
       case 'style':
         break;

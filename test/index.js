@@ -1,9 +1,15 @@
-require('basichtml').init();
+// require('basichtml').init({});
 
-document.importNode = function (arg) {};
+
+const {parseHTML} = require('linkedom');
+
+const {document, customElements, HTMLElement,} = parseHTML('<html />');
+
+globalThis.document = document;
+globalThis.customElements = customElements;
+globalThis.HTMLElement = HTMLElement;
 
 const uhtml = require('uhtml');
-uhtml.html = function () { return ''; };
 const {define, css} = require('../cjs');
 
 console.assert(css`1${2}3` === '123', 'css works');
@@ -20,6 +26,7 @@ define('el-5', {
   attributeChanged() {}
 });
 define('el-6', {
+  observedAttributes: ['test'],
   props: {test: true},
   bound: ['render'],
   constructor() {},
@@ -62,20 +69,18 @@ el6.test = false;
 console.assert(el6.test === false, 'defined props working as setter');
 el6.connectedCallback();
 
-const El7 = customElements.get('el-7');
-const el7 = new El7(document);
+const el7 = document.createElement('div', {is: 'el-7'});
 el7.connectedCallback();
 el7.html``;
 
 el7.innerHTML = `<el-6 test=false></el-6>`;
-console.assert(el7.firstChild.test === 'false', 'attribute over default prop');
+console.assert(el7.firstChild.test === false, 'props over attributes');
 
 /* https://github.com/whatwg/html/issues/5552
 ((c,w,m)=>{
   m=c[w];c[w]=n=>m.call(c,n).then(()=>c.get(n));
 })(customElements,'whenDefined');
 //*/
-
 customElements.whenDefined('uce-lib').then(
   ({css, html, svg, render, define: udefine} = customElements.get('uce-lib')) => {
     console.assert(css`1${2}3` === '123', 'css works');
