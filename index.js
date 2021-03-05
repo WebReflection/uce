@@ -62,7 +62,7 @@ var uce = (function (exports) {
     if (typeof Proxy === "function") return true;
 
     try {
-      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
       return true;
     } catch (e) {
       return false;
@@ -122,13 +122,13 @@ var uce = (function (exports) {
 
   var attr = /([^\s\\>"'=]+)\s*=\s*(['"]?)$/;
   var empty = /^(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)$/i;
-  var node$1 = /<[a-z][^>]+$/i;
+  var node = /<[a-z][^>]+$/i;
   var notNode = />[^<>]*$/;
   var selfClosing = /<([a-z]+[a-z0-9:._-]*)([^>]*?)(\/>)/ig;
   var trimEnd = /\s+$/;
 
   var isNode = function isNode(template, i) {
-    return 0 < i-- && (node$1.test(template[i]) || !notNode.test(template[i]) && isNode(template, i));
+    return 0 < i-- && (node.test(template[i]) || !notNode.test(template[i]) && isNode(template, i));
   };
 
   var regular = function regular(original, name, extra) {
@@ -414,8 +414,12 @@ var uce = (function (exports) {
     };
   };
   var ref = function ref(node) {
+    var oldValue;
     return function (value) {
-      if (typeof value === 'function') value(node);else value.current = node;
+      if (oldValue !== value) {
+        oldValue = value;
+        if (typeof value === 'function') value(node);else value.current = node;
+      }
     };
   };
   var setter = function setter(node, key) {
@@ -566,14 +570,11 @@ var uce = (function (exports) {
         case 'boolean':
           if (oldValue !== newValue) {
             oldValue = newValue;
-            if (text) text.nodeValue = newValue;else text = document.createTextNode(newValue);
+            if (!text) text = document.createTextNode('');
+            text.data = newValue;
             nodes = diff(comment, nodes, [text]);
           }
 
-          break;
-
-        case 'function':
-          anyContent(newValue(node));
           break;
         // null, and undefined are used to cleanup previous content
 
@@ -608,6 +609,11 @@ var uce = (function (exports) {
             nodes = diff(comment, nodes, newValue.nodeType === 11 ? slice.call(newValue.childNodes) : [newValue]);
           }
 
+          break;
+
+        case 'function':
+          anyContent(newValue(comment));
+          break;
       }
     };
 
@@ -675,7 +681,7 @@ var uce = (function (exports) {
   // content, within the exact same amount of updates each time.
   // This cache relates each template to its unique content and updates.
 
-  var cache = umap(new WeakMap()); // a RegExp that helps checking nodes that cannot contain comments
+  var cache$1 = umap(new WeakMap()); // a RegExp that helps checking nodes that cannot contain comments
 
   var textOnly = /^(?:plaintext|script|style|textarea|title|xmp)$/i;
   var createCache = function createCache() {
@@ -738,7 +744,7 @@ var uce = (function (exports) {
       if (node.nodeType === 8) {
         // The only comments to be considered are those
         // which content is exactly the same as the searched one.
-        if (node.nodeValue === search) {
+        if (node.data === search) {
           nodes.push({
             type: 'node',
             path: createPath(node)
@@ -788,7 +794,7 @@ var uce = (function (exports) {
 
 
   var mapUpdates = function mapUpdates(type, template) {
-    var _ref = cache.get(template) || cache.set(template, mapTemplate(type, template)),
+    var _ref = cache$1.get(template) || cache$1.set(template, mapTemplate(type, template)),
         content = _ref.content,
         nodes = _ref.nodes; // clone deeply the fragment
 
@@ -873,8 +879,8 @@ var uce = (function (exports) {
     this.values = values;
   }
 
-  var create = Object.create,
-      defineProperties = Object.defineProperties; // both `html` and `svg` template literal tags are polluted
+  var create$1 = Object.create,
+      defineProperties$2 = Object.defineProperties; // both `html` and `svg` template literal tags are polluted
   // with a `for(ref[, id])` and a `node` tag too
 
   var tag = function tag(type) {
@@ -896,7 +902,7 @@ var uce = (function (exports) {
       };
     };
 
-    return defineProperties( // non keyed operations are recognized as instance of Hole
+    return defineProperties$2( // non keyed operations are recognized as instance of Hole
     // during the "unroll", recursively resolved and updated
     function (template) {
       for (var _len2 = arguments.length, values = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -911,7 +917,7 @@ var uce = (function (exports) {
         // related node, handy with JSON results and mutable list of objects
         // that usually carry a unique identifier
         value: function value(ref, id) {
-          var memo = keyed.get(ref) || keyed.set(ref, create(null));
+          var memo = keyed.get(ref) || keyed.set(ref, create$1(null));
           return memo[id] || (memo[id] = fixed(createCache()));
         }
       },
@@ -935,7 +941,7 @@ var uce = (function (exports) {
   }; // each rendered node gets its own cache
 
 
-  var cache$1 = umap(new WeakMap()); // rendering means understanding what `html` or `svg` tags returned
+  var cache = umap(new WeakMap()); // rendering means understanding what `html` or `svg` tags returned
   // and it relates a specific node to its own unique cache.
   // Each time the content to render changes, the node is cleaned up
   // and the new new content is appended, and if such content is a Hole
@@ -943,7 +949,7 @@ var uce = (function (exports) {
 
   var render = function render(where, what) {
     var hole = typeof what === 'function' ? what() : what;
-    var info = cache$1.get(where) || cache$1.set(where, createCache());
+    var info = cache.get(where) || cache.set(where, createCache());
     var wire = hole instanceof Hole ? unroll(info, hole) : hole;
 
     if (wire !== info.wire) {
@@ -971,7 +977,7 @@ var uce = (function (exports) {
   }
 
   var defineProperties$1 = Object.defineProperties,
-      keys = Object.keys;
+      keys$1 = Object.keys;
 
   var accessor = function accessor(all, shallow, hook, value, update) {
     return {
@@ -993,7 +999,7 @@ var uce = (function (exports) {
     var hook = useState !== noop;
     var args = [all, shallow, hook];
 
-    for (var ke = keys(props), y = 0; y < ke.length; y++) {
+    for (var ke = keys$1(props), y = 0; y < ke.length; y++) {
       var value = get(props, ke[y]);
       var extras = hook ? useState(value) : [value, useState];
       if (update) extras[1] = update;
@@ -1044,10 +1050,10 @@ var uce = (function (exports) {
   });
   var CE = customElements;
   var defineCustomElement = CE.define;
-  var create$1 = Object.create,
-      defineProperties$2 = Object.defineProperties,
+  var create = Object.create,
+      defineProperties = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
-      keys$1 = Object.keys;
+      keys = Object.keys;
   var element = 'element';
   var constructors = umap(new Map([[element, {
     c: HTMLElement,
@@ -1081,12 +1087,12 @@ var uce = (function (exports) {
     var statics = {};
     var proto = {};
     var listeners = [];
-    var retype = create$1(null);
+    var retype = create(null);
 
     var bootstrap = function bootstrap(element, key, value) {
       if (!initialized.has(element)) {
         initialized.set(element, 0);
-        defineProperties$2(element, {
+        defineProperties(element, {
           html: {
             configurable: true,
             value: content.bind(attachShadow ? element.attachShadow(attachShadow) : element)
@@ -1107,7 +1113,7 @@ var uce = (function (exports) {
       }
     };
 
-    for (var k = keys$1(definition), i = 0, _length = k.length; i < _length; i++) {
+    for (var k = keys(definition), i = 0, _length = k.length; i < _length; i++) {
       var key = k[i];
 
       if (/^on./.test(key) && !/Options$/.test(key)) {
@@ -1164,7 +1170,7 @@ var uce = (function (exports) {
           };
         };
 
-        for (var _k = keys$1(props), _i = 0; _i < _k.length; _i++) {
+        for (var _k = keys(props), _i = 0; _i < _k.length; _i++) {
           _loop(_k, _i);
         }
       } else {
@@ -1222,8 +1228,8 @@ var uce = (function (exports) {
 
       return MicroElement;
     }(c);
-    defineProperties$2(MicroElement, statics);
-    defineProperties$2(MicroElement.prototype, proto);
+    defineProperties(MicroElement, statics);
+    defineProperties(MicroElement.prototype, proto);
     var args = [tagName, MicroElement];
     if (e !== element) args.push({
       "extends": e
