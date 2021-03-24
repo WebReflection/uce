@@ -604,7 +604,7 @@ var uce = (function (exports) {
           // is not expected one, nothing happens, as easy as that.
 
 
-          if ('ELEMENT_NODE' in newValue && oldValue !== newValue) {
+          if (oldValue !== newValue && 'ELEMENT_NODE' in newValue) {
             oldValue = newValue;
             nodes = diff(comment, nodes, newValue.nodeType === 11 ? slice.call(newValue.childNodes) : [newValue]);
           }
@@ -1050,11 +1050,14 @@ var uce = (function (exports) {
   });
   var CE = customElements;
   var defineCustomElement = CE.define;
+  var parse = JSON.parse,
+      stringify = JSON.stringify;
   var create = Object.create,
       defineProperties = Object.defineProperties,
       getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor,
       keys = Object.keys;
   var element = 'element';
+  var ownProps = new WeakMap();
   var constructors = umap(new Map([[element, {
     c: HTMLElement,
     e: element
@@ -1107,7 +1110,20 @@ var uce = (function (exports) {
         }
 
         if (bound) bound.forEach(bind, element);
-        if (props) reactive(element, props, render);
+
+        if (props) {
+          var reProps = {};
+
+          for (var k = keys(props), _i = 0; _i < k.length; _i++) {
+            var _key = k[_i];
+            var _value = props[_key];
+            reProps[_key] = typeof(_value) === 'object' ? parse(stringify(_value)) : _value;
+          }
+
+          ownProps.set(element, reProps);
+          reactive(element, reProps, render);
+        }
+
         if (init || render) (init || render).call(element);
         if (key) element[key] = value;
       }
@@ -1157,12 +1173,12 @@ var uce = (function (exports) {
 
     if (props !== null) {
       if (props) {
-        var _loop = function _loop(_k, _i) {
-          var key = _k[_i];
+        var _loop = function _loop(_k, _i2) {
+          var key = _k[_i2];
           proto[key] = {
             get: function get() {
               bootstrap(this);
-              return props[key];
+              return ownProps.get(this)[key];
             },
             set: function set(value) {
               bootstrap(this, key, value);
@@ -1170,16 +1186,16 @@ var uce = (function (exports) {
           };
         };
 
-        for (var _k = keys(props), _i = 0; _i < _k.length; _i++) {
-          _loop(_k, _i);
+        for (var _k = keys(props), _i2 = 0; _i2 < _k.length; _i2++) {
+          _loop(_k, _i2);
         }
       } else {
         proto.props = {
           get: function get() {
             var props = {};
 
-            for (var attributes = this.attributes, _length2 = attributes.length, _i2 = 0; _i2 < _length2; _i2++) {
-              var _attributes$_i = attributes[_i2],
+            for (var attributes = this.attributes, _length2 = attributes.length, _i3 = 0; _i3 < _length2; _i3++) {
+              var _attributes$_i = attributes[_i3],
                   name = _attributes$_i.name,
                   value = _attributes$_i.value;
               props[name] = value;

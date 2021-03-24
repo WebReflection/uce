@@ -5,6 +5,8 @@ const {parseHTML} = require('linkedom');
 
 const {document, customElements, HTMLElement,} = parseHTML('<html />');
 
+const items = [];
+
 globalThis.document = document;
 globalThis.customElements = customElements;
 globalThis.HTMLElement = HTMLElement;
@@ -27,7 +29,7 @@ define('el-5', {
 });
 define('el-6', {
   observedAttributes: ['test'],
-  props: {test: true},
+  props: {test: true, items},
   bound: ['render'],
   constructor() {},
   connected() {},
@@ -75,6 +77,8 @@ el7.html``;
 
 el7.innerHTML = `<el-6 test=false></el-6>`;
 console.assert(el7.firstChild.test === false, 'props over attributes');
+console.assert(el7.firstChild.items !== items, 'props not shared');
+console.assert(el7.firstChild.items.join('') === '', 'props not shared');
 
 /* https://github.com/whatwg/html/issues/5552
 ((c,w,m)=>{

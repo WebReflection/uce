@@ -8,9 +8,11 @@ const reactive = domHandler({dom: true});
 
 const CE = customElements;
 const {define: defineCustomElement} = CE;
+const {parse, stringify} = JSON;
 const {create, defineProperties, getOwnPropertyDescriptor, keys} = Object;
 
 const element = 'element';
+const ownProps = new WeakMap;
 const constructors = umap(new Map([[element, {c: HTMLElement, e: element}]]));
 
 const el = name => document.createElement(name);
@@ -56,8 +58,16 @@ const define = (tagName, definition) => {
       }
       if (bound)
         bound.forEach(bind, element);
-      if (props)
-        reactive(element, props, render);
+      if (props) {
+        const reProps = {};
+        for (let k = keys(props), i = 0; i < k.length; i++) {
+          const key = k[i];
+          const value = props[key];
+          reProps[key] = typeof value === 'object' ? parse(stringify(value)) : value;
+        }
+        ownProps.set(element, reProps);
+        reactive(element, reProps, render);
+      }
       if (init || render)
         (init || render).call(element);
       if (key)
@@ -102,7 +112,7 @@ const define = (tagName, definition) => {
         proto[key] = {
           get() {
             bootstrap(this);
-            return props[key];
+            return ownProps.get(this)[key];
           },
           set(value) {
             bootstrap(this, key, value);
