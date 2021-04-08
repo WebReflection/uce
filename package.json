@@ -3,6 +3,7 @@
   "version": "1.16.0",
   "description": "µhtml based Custom Elements",
   "main": "cjs/index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "npm run cjs && npm run rollup:new && npm run rollup:babel && drop-babel-typeof ./index.js && npm run min && npm run test && npm run size",
     "cjs": "rm cjs/* && ascjs esm cjs && sed -i 's/esm\\/dom\\.js/dom/' cjs/index.js",
