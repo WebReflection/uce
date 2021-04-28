@@ -625,6 +625,7 @@ var uce = (function (exports) {
   //  * .dataset=${...} for dataset related attributes
   //  * .setter=${...}  for Custom Elements setters or nodes with setters
   //                    such as buttons, details, options, select, etc
+  //  * @event=${...}   to explicitly handle event listeners
   //  * onevent=${...}  to automatically handle event listeners
   //  * generic=${...}  to handle an attribute just like an attribute
 
@@ -638,6 +639,9 @@ var uce = (function (exports) {
 
       case '.':
         return setter(node, name.slice(1));
+
+      case '@':
+        return event(node, 'on' + name.slice(1));
 
       case 'o':
         if (name[1] === 'n') return event(node, name);
