@@ -1,4 +1,4 @@
-var uce = (function (exports) {
+self.uce = (function (exports) {
   'use strict';
 
   
