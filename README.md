@@ -35,9 +35,11 @@ define('my-component', {
   extends: 'div',
 
   // if specified, it injects once per class definition
-  // a <style> element in the document <head>.
-  // In this case, selector will be the string:
-  // div[is="my-component"]
+  // a global <style> element in the document <head>, but
+  // *not* in the shadowRoot. You can render style just fine
+  // within the render, if shadow DOM is desired.
+  // For the one-off global case, this method will be invoked with
+  // a selector like `div[is="my-component"]` or `some-component`
   style: selector => css`${selector} {
     font-weight: bold;
   }`,
