@@ -2,9 +2,9 @@ type HTML = import('uhtml').Tag<HTMLElement>;
 type SVG = import('uhtml').Tag<SVGElement>;
 type CSS = (strings: TemplateStringsArray, ...values: unknown[]) => string;
 type Render<T, U> = (
-  this: {props: T} & U & { html: HTML; render: Render<T, U> } & HTMLElement,
+  this: {props: T} & T & U & { html: HTML; render: Render<T, U> } & HTMLElement,
 ) => unknown;
-type This<T, U> = { props: T } & U & {
+type This<T, U> = { props: T } & T & U & {
     html: HTML;
     render: Render<T, U>;
   } & HTMLElement;
@@ -70,7 +70,7 @@ export interface Definition<T = void, U = void> {
    * and *always* before connected/attributeChanged/props
    */
   init?: (
-    this: { props: T } & U & HTMLElement & { html: HTML; render: Render<T, U> },
+    this: { props: T } & T & U & HTMLElement & { html: HTML; render: Render<T, U> },
   ) => unknown;
 
   /**
