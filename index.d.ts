@@ -101,7 +101,7 @@ export interface Definition<T = void, U = void> {
    * is by prefixing the attribute via `.`, that is:
    * this.html`<my-comp .prop=${value}/>`;
    */
-  props?: T;
+  props?: Partial<U> | null;
 
   /**
    * if present, all names will be automatically bound to the element
