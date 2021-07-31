@@ -126,6 +126,7 @@ export interface Definition<T = void, U = void> {
    * observed attribute change
    */
   attributeChanged?: (
+    this: This<T, U>,
     name: string,
     oldValue: unknown,
     newValue: unknown,
@@ -135,8 +136,8 @@ export interface Definition<T = void, U = void> {
    * if specified, will be invoked when the node
    * is either appended live, or removed
    */
-  connected?: () => void;
-  disconnected?: () => void;
+  connected?: (this: This<T, U>) => void;
+  disconnected?: (this: This<T, U>) => void;
 
   /**
    * Optional event handlers
