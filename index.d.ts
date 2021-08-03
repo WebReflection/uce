@@ -27,7 +27,7 @@ export type EventOptions = { once: true } | boolean;
   * 
   * T: Attributes passed to the custom element. For example:
   *        
-  *    type Props = {
+  *    type Attributes = {
   *      count?: number;
   *    };
   * 
@@ -39,13 +39,12 @@ export type EventOptions = { once: true } | boolean;
   *      dec: () => unknown;
   *    };
   * 
-  * Extend the Definition to define additional accessors:
+  * Extend the Definition to define additional methods and accessors:
   * 
-  *    interface MyCounter extends Definition<Props, OwnProps> {
-  *      onClick: (event: Event) => void;
+  *    interface MyCounter extends Definition<Attributes, OwnProps> {
+  *      method: (this: This<Attributes, OwnProps>, value: string) => string; // some method
   *      onClickOptions: EventOptions;
   *      test: number; // some getter/setter
-  *      method: () => string; // some method
   *    } 
 */
 
