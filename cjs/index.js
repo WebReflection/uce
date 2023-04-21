@@ -29,7 +29,6 @@ const define = (tagName, definition) => {
     bound,
     connected,
     disconnected,
-    formAssociated,
     handleEvent,
     init,
     observedAttributes,
@@ -141,10 +140,6 @@ const define = (tagName, definition) => {
     if (attributeChanged)
       attributeChanged.apply(this, arguments);
   }};
-
-  if (formAssociated) {
-    statics.formAssociated = {value: formAssociated};
-  }
 
   proto.connectedCallback = {value() {
     bootstrap(this);
