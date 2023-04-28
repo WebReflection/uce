@@ -5,7 +5,7 @@
   "main": "cjs/index.js",
   "types": "index.d.ts",
   "scripts": {
-    "build": "npm run cjs && npm run rollup:new && npm run rollup:babel && drop-babel-typeof ./index.js && npm run min && npm run test && npm run size",
+    "build": "npm run cjs && npm run rollup:new && npm run rollup:babel && npm run min && npm run test && npm run size",
     "cjs": "rm cjs/* && ascjs esm cjs && sed -i 's/esm\\/dom\\.js/dom/' cjs/index.js",
     "rollup:new": "rollup --config rollup/new.config.js",
     "rollup:babel": "rollup --config rollup/babel.config.js",
@@ -29,7 +29,6 @@
     "ascjs": "^5.0.1",
     "c8": "^7.7.3",
     "coveralls": "^3.1.1",
-    "drop-babel-typeof": "^1.0.3",
     "linkedom": "^0.11.0",
     "rollup": "^2.53.1",
     "rollup-plugin-babel": "^4.4.0",
