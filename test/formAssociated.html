@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Testing Form Association</title>
+    <script src="../min.js"></script>
+    <script type="module">
+      const { define } = uce;
+
+      const form = document.getElementById("form");
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        window.alert("Submit Captured");
+      });
+
+      const sharedButtonConfig = {
+        attachShadow: { mode: "open", delegateFocus: true },
+        init() {
+          this.btnRef = {};
+
+          this.render();
+          this.internals_ = this.attachInternals();
+        },
+        onClick() {
+          if (this.btnRef.current.type === "submit" && this.internals_.form) {
+            this.internals_.form.requestSubmit();
+          }
+        },
+      };
+
+      define("form-enabled-button", {
+        // Without static formAssociated property, this will trigger
+        // Uncaught DOMException: ElementInternals.form getter: Target element is not a form-associated custom element
+        formAssociated: true,
+        ...sharedButtonConfig,
+        render() {
+          this.html`
+            <button ref=${this.btnRef}>
+                <slot>Clicking me will trigger form submit</slot>
+            </button>
+          `;
+        },
+      });
+
+      define("basic-button", {
+        // formAssociated: true,
+        ...sharedButtonConfig,
+        render() {
+          this.html`
+            <button ref=${this.btnRef}>
+                <slot>Clicking me will NOT trigger form submit</slot>
+            </button>
+          `;
+        },
+      });
+    </script>
+  </head>
+  <body>
+    <form id="form">
+      <form-enabled-button></form-enabled-button>
+      <basic-button></basic-button>
+    </form>
+  </body>
+</html>
