@@ -1,12 +1,8 @@
-import resolve from 'rollup-plugin-node-resolve';
-import babel from 'rollup-plugin-babel';
-import includePaths from 'rollup-plugin-includepaths';
+import resolve from '@rollup/plugin-node-resolve';
+import babel from '@rollup/plugin-babel';
 export default {
   input: './esm/index.js',
   plugins: [
-    includePaths({
-      include: {},
-    }),
     resolve(),
     babel({presets: ['@babel/preset-env']})
   ],
