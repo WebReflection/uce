@@ -1,5 +1,5 @@
-import resolve from 'rollup-plugin-node-resolve';
-import {terser} from 'rollup-plugin-terser';
+import resolve from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
 import includePaths from 'rollup-plugin-includepaths';
 export default {
   input: './esm/index.js',
