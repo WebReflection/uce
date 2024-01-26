@@ -3,13 +3,14 @@
 
 const {parseHTML} = require('linkedom');
 
-const {document, customElements, HTMLElement,} = parseHTML('<html />');
+const {document, customElements, HTMLElement, DocumentFragment} = parseHTML('<html />');
 
 const items = [];
 
 globalThis.document = document;
 globalThis.customElements = customElements;
 globalThis.HTMLElement = HTMLElement;
+globalThis.DocumentFragment = DocumentFragment;
 
 const uhtml = require('uhtml');
 const {define, css} = require('../cjs');
